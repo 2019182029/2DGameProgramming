@@ -7,7 +7,7 @@ from pico2d import *
 def init():
     global image
 
-    image = load_image('selection.png')
+    image = load_image('resource\\selection.png')
 
 
 def finish():
@@ -20,7 +20,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(250, 225, 502, 450)
+    image.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
     update_canvas()
 
 

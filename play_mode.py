@@ -1,14 +1,14 @@
 from pico2d import *
 
 import game_world
-import selection_mode
+import select_mode
 import game_framework
 
 
 def init():
     global image
 
-    image = load_image('playground.png')
+    image = load_image('resource\\playground.png')
 
 
 def finish():
@@ -21,7 +21,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(250, 225, 502, 450)
+    image.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
     update_canvas()
     delay(0.01)
 
@@ -32,7 +32,7 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_mode(selection_mode)
+            game_framework.change_mode(select_mode)
 
 
 def pause():
