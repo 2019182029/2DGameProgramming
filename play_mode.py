@@ -4,11 +4,19 @@ import game_world
 import select_mode
 import game_framework
 
+from player import Player
+from court import Court
+
 
 def init():
-    global image
+    global court
+    global player
 
-    image = load_image('resource\\playground.png')
+    court = Court()
+    game_world.add_object(court)
+
+    player = Player()
+    game_world.add_object(player, 1)
 
 
 def finish():
@@ -21,7 +29,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    game_world.render()
     update_canvas()
     delay(0.01)
 
@@ -32,7 +40,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_mode(select_mode)
+            # game_framework.change_mode(select_mode)
+            game_framework.quit()
 
 
 def pause():
