@@ -31,7 +31,7 @@ def draw():
     clear_canvas()
     game_world.render()
     update_canvas()
-    delay(0.01)
+    # delay(0.1)
 
 
 def handle_events():
@@ -42,6 +42,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             # game_framework.change_mode(select_mode)
             game_framework.quit()
+        else:
+            player.handle_event(event)
 
 
 def pause():
