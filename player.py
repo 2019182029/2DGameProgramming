@@ -1,5 +1,5 @@
 from pico2d import *
-from event import *
+from event_check import *
 
 import game_world
 import game_framework
@@ -12,16 +12,19 @@ RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 # Player Action Speed
-TIME_PER_ACTION = 0.25
+TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 4
 FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
+
+actions = {'Idle': 1, 'Run': 2, 'Stand': 3}
 
 
 class Idle:
     @staticmethod
     def enter(player, e):
-        player.action = 1
+        if player.face_dir == 'Right' or player.face_dir == 'Left': player.action = actions['Stand']
+        else: player.action = actions['Idle']
 
     @staticmethod
     def exit(player, e):
@@ -29,41 +32,29 @@ class Idle:
 
     @staticmethod
     def do(player):
-        pass
+        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 4
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
-
-
-class Ready:
-
-    @staticmethod
-    def enter(player, e):
-        player.frame = 0
-        player.action = 0
-
-    @staticmethod
-    def exit(player, e):
-        pass
-
-    @staticmethod
-    def do(player):
-        pass
-
-    @staticmethod
-    def draw(player):
-        player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
+        if player.face_dir == 'Left':
+            player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
+                                             player.x, player.y, 23 * 4, 40 * 4)
+        else:
+            player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
+                                   player.x, player.y, 23 * 4, 40 * 4)
 
 
 class RunX:
     @staticmethod
     def enter(player, e):
-        player.action = 1
+        player.action = actions['Run']
+
         if right_down(e) or left_up(e):
             player.xdir = 1
+            player.face_dir = 'Right'
         elif left_down(e) or right_up(e):
             player.xdir = -1
+            player.face_dir = 'Left'
 
     @staticmethod
     def exit(player, e):
@@ -76,21 +67,30 @@ class RunX:
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
+        if player.face_dir == 'Right':
+            player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
+                                   player.x, player.y, 23 * 4, 40 * 4)
+        elif player.face_dir == 'Left':
+            player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
+                                             player.x, player.y, 23 * 4, 40 * 4)
 
 
 class RunY:
     @staticmethod
     def enter(player, e):
-        player.action = 1
-        if up_down(e) or down_up(e):
-            player.ydir = 1
-        elif down_down(e) or up_up(e):
-            player.ydir = -1
+        player.action = actions['Run']
+
+        if player.face_dir == 'Middle': player.face_dir = 'Right'
+
+        if up_down(e) or down_up(e): player.ydir = 1
+        elif down_down(e) or up_up(e): player.ydir = -1
+
+        if player.xdir > 0: player.face_dir = 'Right'
+        elif player.xdir < 0: player.face_dir = 'Left'
 
     @staticmethod
     def exit(player, e):
-        pass
+        player.face_dir = 'Middle'
 
     @staticmethod
     def do(player):
@@ -99,21 +99,28 @@ class RunY:
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
+        if player.face_dir == 'Right':
+            player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
+                                   player.x, player.y, 23 * 4, 40 * 4)
+        elif player.face_dir == 'Left':
+            player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
+                                             player.x, player.y, 23 * 4, 40 * 4)
 
 
 class RunXY:
     @staticmethod
     def enter(player, e):
-        player.action = 1
+        player.action = actions['Run']
+
         if right_down(e) or left_up(e):
             player.xdir = 1
+            player.face_dir = 'Right'
         elif left_down(e) or right_up(e):
             player.xdir = -1
-        if up_down(e) or down_up(e):
-            player.ydir = 1
-        elif down_down(e) or up_up(e):
-            player.ydir = -1
+            player.face_dir = 'Left'
+
+        if up_down(e) or down_up(e): player.ydir = 1
+        elif down_down(e) or up_up(e): player.ydir = -1
 
     @staticmethod
     def exit(player, e):
@@ -127,7 +134,12 @@ class RunXY:
 
     @staticmethod
     def draw(player):
-        player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
+        if player.face_dir == 'Right':
+            player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
+                                   player.x, player.y, 23 * 4, 40 * 4)
+        elif player.face_dir == 'Left':
+            player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
+                                             player.x, player.y, 23 * 4, 40 * 4)
 
 
 class StateMachine:
@@ -142,8 +154,7 @@ class StateMachine:
             RunY: {right_down: RunXY, left_down: RunXY, right_up: RunXY, left_up: RunXY,
                    up_down: Idle, down_down: Idle, up_up: Idle, down_up: Idle},
             RunXY: {right_down: RunY, left_down: RunY, right_up: RunY, left_up: RunY,
-                    up_down: RunX, down_down: RunX, up_up: RunX, down_up: RunX},
-            Ready: {}
+                    up_down: RunX, down_down: RunX, up_up: RunX, down_up: RunX}
         }
 
     def start(self):
@@ -170,7 +181,7 @@ class Player:
         self.x, self.y = 500, 150
         self.frame = 0
         self.action = 0
-        self.face_dir = 1
+        self.face_dir = 'Middle'
         self.xdir, ydir = 0, 0
         self.image = load_image('resource\\tennis_player.png')
         self.state_machine = StateMachine(self)
