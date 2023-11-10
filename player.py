@@ -62,6 +62,7 @@ class Swing:
     @staticmethod
     def enter(player, e):
         player.frame = 0
+        if player.face_dir == 'Middle': player.swing_dir = 'Left' if player.x > COURT_WIDTH // 2 else 'Right'
         player.action = actions['Swing']
 
     @staticmethod
@@ -116,13 +117,12 @@ class RunY:
     def enter(player, e):
         player.action = actions['Run']
 
-        if player.face_dir == 'Middle': player.face_dir = 'Right'
+        if player.face_dir == 'Middle' and player.xdir == 0: player.face_dir = 'Right'
+        elif player.face_dir == 'Middle' and player.x > COURT_WIDTH // 2: player.face_dir = 'Left'
+        elif player.face_dir == 'Middle' and player.x < COURT_WIDTH // 2: player.face_dir = 'Right'
 
         if up_down(e) or down_up(e): player.ydir = 1
         elif down_down(e) or up_up(e): player.ydir = -1
-
-        if player.xdir > 0: player.face_dir = 'Right'
-        elif player.xdir < 0: player.face_dir = 'Left'
 
     @staticmethod
     def exit(player, e):
