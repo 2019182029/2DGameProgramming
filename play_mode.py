@@ -36,6 +36,7 @@ def finish():
 
 def update():
     game_world.update()
+    referee.setheading(ball)
 
 
 def draw():

@@ -15,7 +15,7 @@ FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
 
 class Ball:
     def __init__(self):
-        self.x, self.y = 500, 100
+        self.x, self.y = 500, 0
         self.frame = 0
         self.xdir, self.ydir = 0, 0.5
         self.image = load_image('resource\\tennis_ball.png')
@@ -26,3 +26,5 @@ class Ball:
 
     def draw(self):
         self.image.clip_draw(int(self.frame) * 7, 0, 7, 8, self.x, self.y, 50, 50)
+
+
