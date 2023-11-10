@@ -6,14 +6,19 @@ import game_framework
 
 from player import Player
 from court import Court
+from ball import Ball
 
 
 def init():
     global court
+    global ball
     global player
 
     court = Court()
     game_world.add_object(court)
+
+    ball = Ball()
+    game_world.add_object(ball, 1)
 
     player = Player()
     game_world.add_object(player, 1)

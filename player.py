@@ -18,6 +18,8 @@ FRAMES_PER_ACTION = 4
 FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
 
 actions = {'Idle': 1, 'Run': 2, 'Stand': 3}
+COURT_WIDTH = 1000
+COURT_HEIGHT = 950
 
 
 class Idle:
@@ -36,7 +38,14 @@ class Idle:
 
     @staticmethod
     def draw(player):
-        if player.face_dir == 'Left':
+        if player.action == actions['Idle']:
+            if player.x > COURT_WIDTH // 2:
+                player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
+                                                 player.x, player.y, 23 * 4, 40 * 4 + 15)
+            else:
+                player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
+                                       player.x, player.y, 23 * 4, 40 * 4 + 15)
+        elif player.face_dir == 'Left':
             player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
                                              player.x, player.y, 23 * 4, 40 * 4)
         else:
