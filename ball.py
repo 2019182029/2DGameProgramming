@@ -17,12 +17,15 @@ class Ball:
     def __init__(self):
         self.x, self.y = 500, 0
         self.frame = 0
-        self.xdir, self.ydir = 0, 0.5
+        self.xdir, self.ydir = 0, 1.0
         self.image = load_image('resource\\tennis_ball.png')
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 6
         self.y += self.ydir * RUN_SPEED_PPS * game_framework.frame_time
+
+        if self.y >= 950: self.ydir = -1.0
+        elif self.y <= 0: self.ydir = 1.0
 
     def draw(self):
         self.image.clip_draw(int(self.frame) * 7, 0, 7, 8, self.x, self.y, 50, 50)
