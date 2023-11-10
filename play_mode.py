@@ -7,21 +7,27 @@ import game_framework
 from player import Player
 from court import Court
 from ball import Ball
+from referee import Referee
 
 
 def init():
     global court
-    global ball
     global player
+    global ball
+    global referee
 
     court = Court()
     game_world.add_object(court)
 
-    ball = Ball()
-    game_world.add_object(ball, 1)
-
     player = Player()
-    game_world.add_object(player, 1)
+    game_world.add_object(player, 3)
+
+    ball = Ball()
+    game_world.add_object(ball, 2)
+
+    referee = Referee()
+    game_world.add_object(referee, 1)
+
 
 
 def finish():
