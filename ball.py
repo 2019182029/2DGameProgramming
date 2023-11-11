@@ -1,4 +1,5 @@
 from pico2d import *
+import random
 import game_framework
 
 PIXEL_PER_METER = (10.0 / 0.06)
@@ -17,13 +18,16 @@ class Ball:
     def __init__(self):
         self.x, self.y = 500, 0
         self.frame = 1
-        self.xdir, self.ydir = 0, 0.5
+        self.xdir, self.ydir = 0, 1.0
         self.image = load_image('resource\\tennis_ball.png')
 
     def update(self):
-        # self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 6
+        # self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.3) % 6
+        self.x += self.xdir * RUN_SPEED_PPS * game_framework.frame_time
         self.y += self.ydir * RUN_SPEED_PPS * game_framework.frame_time
 
+        if self.x >= 750: self.xdir *= -1.0
+        elif self.x <= 250: self.xdir *= -1.0
         if self.y >= 950: self.ydir *= -1.0
         elif self.y <= 0: self.ydir *= -1.0
 
@@ -35,5 +39,7 @@ class Ball:
         return self.x - 10, self.y - 12, self.x + 16, self.y + 10
 
     def handle_collision(self, group, other):
-        if group == 'player:ball': self.ydir *= -1
+        if group == 'player:ball':
+            self.xdir = random.randint(-50, 50) / 100
+            self.ydir *= -1
 

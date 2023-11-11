@@ -79,9 +79,9 @@ class Swing:
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         if int(player.frame) == 2:
             if player.swing_dir == 'Right':
-                player.collision_xy = (player.x + 20, player.y - 5, player.x + 60, player.y + 5)
+                player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
             elif player.swing_dir == 'Left':
-                player.collision_xy = (player.x - 60, player.y - 5, player.x - 20, player.y + 5)
+                player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
 
 
     @staticmethod
