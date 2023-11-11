@@ -1,5 +1,6 @@
 objects = [[] for _ in range(10)]
 collision_pairs = {}
+overlap = False
 
 
 def add_object(o, depth=0):
@@ -36,15 +37,17 @@ def clear():
 
 
 def collide(a, b):
+    global overlap
+
     la, ba, ra, ta = a.get_bb()
     lb, bb, rb, tb = b.get_bb()
 
     if la > rb: return False
     if ra < lb: return False
-    if ta < bb: return False
+    if ta < bb: overlap = False; return False
     if ba > tb: return False
 
-    return True
+    if not overlap: overlap = True; return True
 
 
 def add_collision_pair(group, a, b):

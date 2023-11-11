@@ -77,7 +77,7 @@ class Swing:
         if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
             player.state_machine.handle_event(('TIME_OUT', None))
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if int(player.frame) == 2: player.collision_xy = (player.x + 20, player.y, player.x + 60, player.y + 1)
+        if int(player.frame) == 2: player.collision_xy = (player.x + 20, player.y - 5, player.x + 60, player.y + 5)
 
     @staticmethod
     def draw(player):

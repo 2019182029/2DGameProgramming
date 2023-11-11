@@ -16,23 +16,23 @@ FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
 class Ball:
     def __init__(self):
         self.x, self.y = 500, 0
-        self.frame = 2
-        self.xdir, self.ydir = 0, 1.0
+        self.frame = 1
+        self.xdir, self.ydir = 0, 0.5
         self.image = load_image('resource\\tennis_ball.png')
 
     def update(self):
         # self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 6
         self.y += self.ydir * RUN_SPEED_PPS * game_framework.frame_time
 
-        if self.y >= 950: self.ydir = -1.0
-        elif self.y <= 0: self.ydir = 1.0
+        if self.y >= 950: self.ydir *= -1.0
+        elif self.y <= 0: self.ydir *= -1.0
 
     def draw(self):
         self.image.clip_draw(int(self.frame) * 7, 0, 7, 8, self.x, self.y, 50, 50)
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return self.x - 10, self.y - 10, self.x + 10, self.y + 10
+        return self.x - 10, self.y - 12, self.x + 16, self.y + 10
 
     def handle_collision(self, group, other):
         if group == 'player:ball': self.ydir *= -1
