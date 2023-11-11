@@ -77,7 +77,12 @@ class Swing:
         if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
             player.state_machine.handle_event(('TIME_OUT', None))
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if int(player.frame) == 2: player.collision_xy = (player.x + 20, player.y - 5, player.x + 60, player.y + 5)
+        if int(player.frame) == 2:
+            if player.swing_dir == 'Right':
+                player.collision_xy = (player.x + 20, player.y - 5, player.x + 60, player.y + 5)
+            elif player.swing_dir == 'Left':
+                player.collision_xy = (player.x - 60, player.y - 5, player.x - 20, player.y + 5)
+
 
     @staticmethod
     def draw(player):
