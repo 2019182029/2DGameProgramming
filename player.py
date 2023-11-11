@@ -67,6 +67,7 @@ class Swing:
 
     @staticmethod
     def exit(player, e):
+        player.collision_xy = (0, 0, 0, 0)
         if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Right': return
         elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Left': return
         player.face_dir = 'Middle'
@@ -76,6 +77,7 @@ class Swing:
         if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
             player.state_machine.handle_event(('TIME_OUT', None))
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+        if int(player.frame) == 2: player.collision_xy = (player.x + 20, player.y, player.x + 60, player.y + 1)
 
     @staticmethod
     def draw(player):
@@ -215,6 +217,7 @@ class Player:
         self.face_dir = 'Middle'
         self.swing_dir = 'Right'
         self.xdir, ydir = 0, 0
+        self.collision_xy = (0, 0, 0, 0)
         self.image = load_image('resource\\tennis_player.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -227,3 +230,10 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
+
+    def get_bb(self):
+        return self.collision_xy
+
+    def handle_collision(self, group, other):
+        pass
