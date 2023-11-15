@@ -23,14 +23,6 @@ COURT_HEIGHT = 950
 actions = {'Idle': 0, 'Run': 1, 'Stand': 2, 'Swing': 3}
 
 
-def player_composite_draw(player):
-    player.image.clip_composite_draw(
-        int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h', player.x, player.y, 23 * 4, 40 * 4 )
-
-def player_draw(player):
-    player.image.clip_draw(
-        int(player.frame) * 23, player.action * 40, 23, 40, player.x, player.y, 23 * 4, 40 * 4)
-
 class Idle:
     @staticmethod
     def enter(player, e):
@@ -47,18 +39,18 @@ class Idle:
     def do(player):
         if player.action == actions['Swing']:
             if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
-                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Left':
+                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Right':
                     player.face_dir = 'Right'
                     player.action = actions['Stand']
-                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Right':
+                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Left':
                     player.face_dir = 'Left'
                     player.action = actions['Stand']
                 else: player.action = actions['Idle']
 
             if int(player.frame) == 2:
-                if player.swing_dir == 'Left':
+                if player.swing_dir == 'Right':
                     player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
-                elif player.swing_dir == 'Right':
+                elif player.swing_dir == 'Left':
                     player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
 
             player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
@@ -69,25 +61,17 @@ class Idle:
     @staticmethod
     def draw(player):
         if player.action == actions['Idle']:
-            if player.x > COURT_WIDTH // 2:
-                player.image.clip_composite_draw(int(player.frame) * 23, player.action * 40, 23, 40, 0, 'h',
-                                                 player.x, player.y, 23 * 4, 40 * 4 + 17)
-            else:
-                player.image.clip_draw(int(player.frame) * 23, player.action * 40, 23, 40,
-                                       player.x, player.y, 23 * 4, 40 * 4 + 17)
-        elif player.face_dir == 'Left': player_composite_draw(player)
-        else: player_draw(player)
+            if player.x > COURT_WIDTH // 2: player.composite_draw_player(23 * 4, 40 * 4 + 17)
+            else: player.draw_player(23 * 4, 40 * 4 + 17)
+        elif player.face_dir == 'Left': player.composite_draw_player()
+        else: player.draw_player()
 
 
 class Run:
     @staticmethod
     def enter(player, e):
-        if right_down(e) or left_up(e):
-            player.xdir += 1
-            player.swing_dir = 'Right'
-        elif left_down(e) or right_up(e):
-            player.xdir -= 1
-            player.swing_dir = 'Left'
+        if right_down(e) or left_up(e): player.xdir += 1
+        elif left_down(e) or right_up(e): player.xdir -= 1
         if up_down(e) or down_up(e): player.ydir += 1
         elif down_down(e) or up_up(e): player.ydir -= 1
 
@@ -96,13 +80,12 @@ class Run:
         if player.action == actions['Swing']: return
         player.action = actions['Run']
 
-        if player.xdir == 1: player.face_dir = 'Right'
-        elif player.xdir == -1: player.face_dir = 'Left'
+        if player.xdir == 1: player.swing_dir = player.face_dir = 'Right'
+        elif player.xdir == -1: player.swing_dir = player.face_dir = 'Left'
 
     @staticmethod
     def exit(player, e):
-        # if player.xdir == 0: player.face_dir = 'Middle'
-        if space_down(e): player.swing(); print('1')
+        if space_down(e): player.swing()
 
     @staticmethod
     def do(player):
@@ -114,18 +97,20 @@ class Run:
                     player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
                 elif player.swing_dir == 'Left':
                     player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
+        else: player.collision_xy = (0, 0, 0, 0)
 
         if player.xdir == 0 and player.ydir == 0 and not player.action == actions['Swing']:
             player.state_machine.handle_event(('CHA_STOPPED', None))
 
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if not player.xdir == 0: player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
-        player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
+        if not player.action == actions['Swing']:
+            if not player.xdir == 0: player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
+            player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
 
     @staticmethod
     def draw(player):
-        if player.face_dir == 'Right': player_draw(player)
-        elif player.face_dir == 'Left': player_composite_draw(player)
+        if player.face_dir == 'Right' or player.face_dir == 'Middle': player.draw_player()
+        elif player.face_dir == 'Left': player.composite_draw_player()
 
 
 class StateMachine:
@@ -174,6 +159,14 @@ class Player:
         self.image = load_image('resource\\tennis_player.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
+
+    def composite_draw_player(self, width = 23 * 4, height = 40 * 4):
+        self.image.clip_composite_draw(
+            int(self.frame) * 23, self.action * 40, 23, 40, 0, 'h', self.x, self.y, width, height)
+
+    def draw_player(self, width = 23 * 4, height = 40 * 4):
+        self.image.clip_draw(
+            int(self.frame) * 23, self.action * 40, 23, 40, self.x, self.y, width, height)
 
     def swing(self):
         self.frame = 0
