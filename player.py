@@ -34,16 +34,37 @@ def player_draw(player):
 class Idle:
     @staticmethod
     def enter(player, e):
+        if player.action == actions['Swing']: return
+
         if player.face_dir == 'Right' or player.face_dir == 'Left': player.action = actions['Stand']
         else: player.action = actions['Idle']
 
     @staticmethod
     def exit(player, e):
-        pass
+        if space_down(e): player.swing()
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 4
+        if player.action == actions['Swing']:
+            if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
+                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Left':
+                    player.face_dir = 'Right'
+                    player.action = actions['Stand']
+                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Right':
+                    player.face_dir = 'Left'
+                    player.action = actions['Stand']
+                else: player.action = actions['Idle']
+
+            if int(player.frame) == 2:
+                if player.swing_dir == 'Left':
+                    player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
+                elif player.swing_dir == 'Right':
+                    player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
+
+            player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+        else:
+            player.collision_xy = (0, 0, 0, 0)
+            player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 4
 
     @staticmethod
     def draw(player):
@@ -58,120 +79,48 @@ class Idle:
         else: player_draw(player)
 
 
-class Swing:
+class Run:
     @staticmethod
     def enter(player, e):
-        player.frame = 0
-        if player.face_dir == 'Middle': player.swing_dir = 'Left' if player.x > COURT_WIDTH // 2 else 'Right'
-        player.action = actions['Swing']
-
-    @staticmethod
-    def exit(player, e):
-        player.collision_xy = (0, 0, 0, 0)
-        if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Right': return
-        elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Left': return
-        player.face_dir = 'Middle'
-
-    @staticmethod
-    def do(player):
-        if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
-            player.state_machine.handle_event(('TIME_OUT', None))
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if int(player.frame) == 2:
-            if player.swing_dir == 'Right':
-                player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
-            elif player.swing_dir == 'Left':
-                player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
-
-
-    @staticmethod
-    def draw(player):
-        if player.swing_dir == 'Left': player_composite_draw(player)
-        else: player_draw(player)
-
-
-class RunX:
-    @staticmethod
-    def enter(player, e):
-        player.action = actions['Run']
-
         if right_down(e) or left_up(e):
-            player.xdir = 1
-            player.face_dir = 'Right'
+            player.xdir += 1
             player.swing_dir = 'Right'
         elif left_down(e) or right_up(e):
-            player.xdir = -1
-            player.face_dir = 'Left'
+            player.xdir -= 1
             player.swing_dir = 'Left'
+        if up_down(e) or down_up(e): player.ydir += 1
+        elif down_down(e) or up_up(e): player.ydir -= 1
 
-    @staticmethod
-    def exit(player, e):
-        pass
+        player.dir = math.atan2(player.ydir, player.xdir)
 
-    @staticmethod
-    def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        player.x += player.xdir * RUN_SPEED_PPS * game_framework.frame_time
-
-    @staticmethod
-    def draw(player):
-        if player.face_dir == 'Right': player_draw(player)
-        elif player.face_dir == 'Left': player_composite_draw(player)
-
-
-class RunY:
-    @staticmethod
-    def enter(player, e):
+        if player.action == actions['Swing']: return
         player.action = actions['Run']
 
-        if player.face_dir == 'Middle' and player.xdir == 0: player.face_dir = 'Right'
-        elif player.face_dir == 'Middle' and player.x > COURT_WIDTH // 2: player.face_dir = 'Left'
-        elif player.face_dir == 'Middle' and player.x < COURT_WIDTH // 2: player.face_dir = 'Right'
-
-        if up_down(e) or down_up(e): player.ydir = 1
-        elif down_down(e) or up_up(e): player.ydir = -1
+        if player.xdir == 1: player.face_dir = 'Right'
+        elif player.xdir == -1: player.face_dir = 'Left'
 
     @staticmethod
     def exit(player, e):
-        player.face_dir = 'Middle'
+        # if player.xdir == 0: player.face_dir = 'Middle'
+        if space_down(e): player.swing(); print('1')
 
     @staticmethod
     def do(player):
+        if player.action == actions['Swing']:
+            if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4: player.action = actions['Run']
+
+            if int(player.frame) == 2:
+                if player.swing_dir == 'Right':
+                    player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
+                elif player.swing_dir == 'Left':
+                    player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
+
+        if player.xdir == 0 and player.ydir == 0 and not player.action == actions['Swing']:
+            player.state_machine.handle_event(('CHA_STOPPED', None))
+
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        player.y += player.ydir * RUN_SPEED_PPS * game_framework.frame_time
-
-    @staticmethod
-    def draw(player):
-        if player.face_dir == 'Right': player_draw(player)
-        elif player.face_dir == 'Left': player_composite_draw(player)
-
-
-class RunXY:
-    @staticmethod
-    def enter(player, e):
-        player.action = actions['Run']
-
-        if right_down(e) or left_up(e):
-            player.xdir = 1
-            player.face_dir = 'Right'
-            player.swing_dir = 'Right'
-        elif left_down(e) or right_up(e):
-            player.xdir = -1
-            player.face_dir = 'Left'
-            player.swing_dir = 'Left'
-
-        if up_down(e) or down_up(e): player.ydir = 1
-        elif down_down(e) or up_up(e): player.ydir = -1
-
-    @staticmethod
-    def exit(player, e):
-        pass
-
-    @staticmethod
-    def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        player.x += player.xdir * RUN_SPEED_PPS * game_framework.frame_time
-        player.y += player.ydir * RUN_SPEED_PPS * game_framework.frame_time
+        if not player.xdir == 0: player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
+        player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
 
     @staticmethod
     def draw(player):
@@ -184,15 +133,10 @@ class StateMachine:
         self.player = player
         self.cur_state = Idle
         self.transitions = {
-            Idle: {right_down: RunX, left_down: RunX, left_up: RunX, right_up: RunX,
-                   up_down: RunY, down_down: RunY, up_up: RunY, down_up: RunY, space_down: Swing},
-            RunX: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle,
-                   up_down: RunXY, down_down: RunXY, up_up: RunXY, down_up: RunXY},
-            RunY: {right_down: RunXY, left_down: RunXY, right_up: RunXY, left_up: RunXY,
-                   up_down: Idle, down_down: Idle, up_up: Idle, down_up: Idle},
-            RunXY: {right_down: RunY, left_down: RunY, right_up: RunY, left_up: RunY,
-                    up_down: RunX, down_down: RunX, up_up: RunX, down_up: RunX},
-            Swing: {time_out: Idle}
+            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run,
+                   up_down: Run, down_down: Run, up_up: Run, down_up: Run, space_down: Idle},
+            Run: {right_down: Run, left_down: Run, right_up: Run, left_up: Run,
+                  up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stopped: Idle, space_down: Run}
         }
 
     def start(self):
@@ -217,15 +161,26 @@ class StateMachine:
 class Player:
     def __init__(self):
         self.x, self.y = 500, 150
+        self.collision_xy = (0, 0, 0, 0)
+
         self.frame = 0
         self.action = 0
+
+        self.dir = 0
+        self.xdir, self.ydir = 0, 0
         self.face_dir = 'Middle'
         self.swing_dir = 'Right'
-        self.xdir, ydir = 0, 0
-        self.collision_xy = (0, 0, 0, 0)
+
         self.image = load_image('resource\\tennis_player.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
+
+    def swing(self):
+        self.frame = 0
+        self.action = actions['Swing']
+        self.collision_xy = (0, 0, 0, 0)
+
+        if self.face_dir == 'Middle': self.swing_dir = 'Left' if self.x > COURT_WIDTH // 2 else 'Right'
 
     def update(self):
         self.state_machine.update()
