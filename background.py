@@ -1,7 +1,7 @@
 from pico2d import *
 
 
-class Court:
+class Background:
     def __init__(self, image):
         self.image = load_image(image)
 

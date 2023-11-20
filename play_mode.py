@@ -6,7 +6,7 @@ import game_framework
 
 from player_1 import Player as P1
 from player_2 import Player as P2
-from court import Court
+from background import Background
 from ball import Ball
 from referee import Referee
 
@@ -17,8 +17,8 @@ def init():
     global ball
     global referee
 
-    court = Court('resource\\tennis_court.png')
-    net = Court('resource\\net.png')
+    court = Background('resource\\tennis_court.png')
+    net = Background('resource\\net.png')
     game_world.add_object(court)
     game_world.add_object(net, 2)
 
