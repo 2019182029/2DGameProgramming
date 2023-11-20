@@ -4,7 +4,7 @@ import game_world
 import select_mode
 import game_framework
 
-from player import Player
+from player_1 import Player
 from court import Court
 from ball import Ball
 from referee import Referee
@@ -12,15 +12,17 @@ from referee import Referee
 
 def init():
     global court
-    global player
+    global player_1, player_2
     global ball
     global referee
 
     court = Court()
     game_world.add_object(court)
 
-    player = Player()
-    game_world.add_object(player, 3)
+    player_1 = Player(500, 150, 'resource\\tennis_player_1.png')
+    player_2 = Player(500, 750, 'resource\\tennis_player_2.png')
+    game_world.add_object(player_1, 3)
+    game_world.add_object(player_2, 3)
 
     ball = Ball()
     game_world.add_object(ball, 2)
@@ -28,7 +30,8 @@ def init():
     referee = Referee()
     game_world.add_object(referee, 1)
 
-    game_world.add_collision_pair('player:ball', player, None)
+    game_world.add_collision_pair('player:ball', player_1, None)
+    game_world.add_collision_pair('player:ball', player_2, None)
     game_world.add_collision_pair('player:ball', None, ball)
 
 
@@ -59,7 +62,7 @@ def handle_events():
             # game_framework.change_mode(select_mode)
             game_framework.quit()
         else:
-            player.handle_event(event)
+            player_1.handle_event(event)
 
 
 def pause():

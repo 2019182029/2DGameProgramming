@@ -144,8 +144,8 @@ class StateMachine:
 
 
 class Player:
-    def __init__(self):
-        self.x, self.y = 500, 150
+    def __init__(self, x, y, image):
+        self.x, self.y = x, y
         self.collision_xy = (0, 0, 0, 0)
 
         self.frame = 0
@@ -156,7 +156,7 @@ class Player:
         self.face_dir = 'Middle'
         self.swing_dir = 'Right'
 
-        self.image = load_image('resource\\tennis_player.png')
+        self.image = load_image(image)
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 
