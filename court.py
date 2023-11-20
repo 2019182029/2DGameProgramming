@@ -2,8 +2,8 @@ from pico2d import *
 
 
 class Court:
-    def __init__(self):
-        self.image = load_image('resource\\playground.png')
+    def __init__(self, image):
+        self.image = load_image(image)
 
     def update(self):
         pass
