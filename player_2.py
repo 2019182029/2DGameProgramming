@@ -33,24 +33,24 @@ class Idle:
 
     @staticmethod
     def exit(player, e):
-        if space_down(e): player.swing()
+        if mouse_click(e): player.swing()
 
     @staticmethod
     def do(player):
         if player.action == actions['Swing']:
             if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
-                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Right':
-                    player.face_dir = 'Right'
-                    player.action = actions['Stand']
-                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Left':
+                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Left':
                     player.face_dir = 'Left'
+                    player.action = actions['Stand']
+                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Right':
+                    player.face_dir = 'Right'
                     player.action = actions['Stand']
                 else: player.action = actions['Idle']
 
             if int(player.frame) == 2:
-                if player.swing_dir == 'Right':
+                if player.swing_dir == 'Left':
                     player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
-                elif player.swing_dir == 'Left':
+                elif player.swing_dir == 'Right':
                     player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
 
             player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
@@ -61,7 +61,7 @@ class Idle:
     @staticmethod
     def draw(player):
         if player.action == actions['Idle']:
-            if player.x > COURT_WIDTH // 2: player.composite_draw_player(23 * 4, 40 * 4 + 17)
+            if player.x <= COURT_WIDTH // 2: player.composite_draw_player(23 * 4, 40 * 4 + 17)
             else: player.draw_player(23 * 4, 40 * 4 + 17)
         elif player.face_dir == 'Left': player.composite_draw_player()
         else: player.draw_player()
@@ -70,22 +70,22 @@ class Idle:
 class Run:
     @staticmethod
     def enter(player, e):
-        if right_down(e) or left_up(e): player.xdir += 1
-        elif left_down(e) or right_up(e): player.xdir -= 1
-        if up_down(e) or down_up(e): player.ydir += 1
-        elif down_down(e) or up_up(e): player.ydir -= 1
+        if d_down(e) or a_up(e): player.xdir += 1
+        elif a_down(e) or d_up(e): player.xdir -= 1
+        if w_down(e) or s_up(e): player.ydir += 1
+        elif s_down(e) or w_up(e): player.ydir -= 1
 
         player.dir = math.atan2(player.ydir, player.xdir)
 
         if player.action == actions['Swing']: return
         player.action = actions['Run']
 
-        if player.xdir == 1: player.swing_dir = player.face_dir = 'Right'
-        elif player.xdir == -1: player.swing_dir = player.face_dir = 'Left'
+        if player.xdir == 1: player.swing_dir = player.face_dir = 'Left'
+        elif player.xdir == -1: player.swing_dir = player.face_dir = 'Right'
 
     @staticmethod
     def exit(player, e):
-        if space_down(e): player.swing()
+        if mouse_click(e): player.swing()
 
     @staticmethod
     def do(player):
@@ -93,9 +93,9 @@ class Run:
             if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4: player.action = actions['Run']
 
             if int(player.frame) == 2:
-                if player.swing_dir == 'Right':
+                if player.swing_dir == 'Left':
                     player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
-                elif player.swing_dir == 'Left':
+                elif player.swing_dir == 'Right':
                     player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
         else: player.collision_xy = (0, 0, 0, 0)
 
@@ -118,10 +118,10 @@ class StateMachine:
         self.player = player
         self.cur_state = Idle
         self.transitions = {
-            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run,
-                   up_down: Run, down_down: Run, up_up: Run, down_up: Run, space_down: Idle},
-            Run: {right_down: Run, left_down: Run, right_up: Run, left_up: Run,
-                  up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stopped: Idle, space_down: Run}
+            Idle: {d_down: Run, a_down: Run, a_up: Run, d_up: Run,
+                   w_down: Run, s_down: Run, w_up: Run, s_up: Run, mouse_click: Idle},
+            Run: {d_down: Run, a_down: Run, d_up: Run, a_up: Run,
+                  w_down: Run, s_down: Run, w_up: Run, s_up: Run, cha_stop: Idle, mouse_click: Run}
         }
 
     def start(self):
