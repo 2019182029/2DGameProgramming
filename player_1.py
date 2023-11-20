@@ -49,9 +49,9 @@ class Idle:
 
             if int(player.frame) == 2:
                 if player.swing_dir == 'Right':
-                    player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
+                    player.collision_xy = (player.x, player.y - 25, player.x + 50, player.y + 25)
                 elif player.swing_dir == 'Left':
-                    player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
+                    player.collision_xy = (player.x - 50, player.y - 25, player.x, player.y + 25)
 
             player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         else:
@@ -94,9 +94,9 @@ class Run:
 
             if int(player.frame) == 2:
                 if player.swing_dir == 'Right':
-                    player.collision_xy = (player.x + 20, player.y - 10, player.x + 60, player.y + 10)
+                    player.collision_xy = (player.x, player.y - 25, player.x + 50, player.y + 25)
                 elif player.swing_dir == 'Left':
-                    player.collision_xy = (player.x - 60, player.y - 10, player.x - 20, player.y + 10)
+                    player.collision_xy = (player.x - 50, player.y - 25, player.x, player.y + 25)
         else: player.collision_xy = (0, 0, 0, 0)
 
         if player.xdir == 0 and player.ydir == 0 and not player.action == actions['Swing']:

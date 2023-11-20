@@ -17,7 +17,7 @@ FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
 class Ball:
     def __init__(self):
         self.x, self.y = 500, 250
-        self.frame = 0
+        self.frame = 1
         self.frame_index = 0
         self.xdir, self.ydir = 0, 0
         self.image = load_image('resource\\tennis_ball.png')
@@ -40,6 +40,6 @@ class Ball:
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
-            self.xdir = random.randint(-50, 50) / 100
+            # self.xdir = random.randint(-50, 50) / 100
             self.ydir = 1 if self.ydir == 0 else self.ydir * -1
 
