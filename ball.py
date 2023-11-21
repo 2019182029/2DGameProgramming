@@ -27,6 +27,8 @@ class Rally:
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
         ball.z += ball.zdir * RUN_SPEED_PPS * game_framework.frame_time
 
+        ball.dir = math.atan2(ball.x, ball.y)
+
         match ball.z // 100:
             case -1: ball.zdir *= -1
             case 0: ball.frame = frames['Small']
@@ -36,7 +38,21 @@ class Rally:
 
     @staticmethod
     def draw(ball):
-        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y + ball.z // 5, 25, 25)
+        if 750 <= ball.x:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // 10),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
+        elif 625 <= ball.x < 750:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // 30),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
+        elif 375 <= ball.x < 625:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x,
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
+        elif 250 <= ball.x < 375:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // 30),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
+        elif ball.x < 250:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // 10),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
         draw_rectangle(*ball.get_bb())
 
 
@@ -70,6 +86,7 @@ class Ball:
         self.x, self.y, self.z = 500, 250, 0
         self.frame = 0
         self.frame_index = 0
+        self.dir = 0
         self.xdir, self.ydir, self.zdir = 0, 0, 1
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
@@ -82,7 +99,10 @@ class Ball:
         self.state_machine.draw()
 
     def get_bb(self):
-        return self.x - 25, self.y + self.z // 5 - 25, self.x + 25, self.y + self.z // 5 + 25
+        return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) - 25,
+                self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
+                self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) + 25,
+                self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
