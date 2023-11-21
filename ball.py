@@ -4,7 +4,7 @@ import game_framework
 import game_world
 
 PIXEL_PER_METER = (10.0 / 0.06)
-RUN_SPEED_KMPH = 20.0
+RUN_SPEED_KMPH = 15.0
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -27,16 +27,16 @@ class Rally:
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
         ball.z += ball.zdir * RUN_SPEED_PPS * game_framework.frame_time
 
-        match ball.z // 300:
+        match ball.z // 100:
             case -1: ball.zdir *= -1
             case 0: ball.frame = frames['Small']
-            case 1: ball.frame = frames['Middle']
-            case 2: ball.frame = frames['Big']
-            case 3: ball.zdir *= -1
+            case 2: ball.frame = frames['Middle']
+            case 4: ball.frame = frames['Big']
+            case 5: ball.zdir *= -1
 
     @staticmethod
     def draw(ball):
-        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y, 25, 25)
+        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y + ball.z // 15, 25, 25)
         draw_rectangle(*ball.get_bb())
 
 
@@ -82,11 +82,11 @@ class Ball:
         self.state_machine.draw()
 
     def get_bb(self):
-        return self.x - 25, self.y - 25, self.x + 25, self.y + 25
+        return self.x - 25, self.y + self.z // 15 - 25, self.x + 25, self.y + self.z // 15 + 25
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
-            self.xdir = random.randint(-50, 50) / 200
+            self.xdir = random.randint(-10, 10) / 200
             self.ydir = 0.5 if self.ydir == 0 else self.ydir * -1
             if self.zdir < 0: self.zdir *= -1
         elif group == 'pannel:ball':
