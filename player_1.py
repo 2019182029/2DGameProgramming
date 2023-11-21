@@ -105,8 +105,8 @@ class Run:
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         if not player.action == actions['Swing']:
             if not player.xdir == 0:
-                if not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time >= 900 and \
-                   not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time <= 100:
+                if not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time >= 950 and \
+                   not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time <= 50:
                     player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
             if not player.y + RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time >= 530:
                 player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time

@@ -12,15 +12,17 @@ from referee import Referee
 
 
 def init():
-    global court, net
+    global court, net, pannel
     global player_1, player_2
     global ball
     global referee
 
     court = Background('resource\\tennis_court.png')
     net = Background('resource\\net.png')
+    pannel = Background('resource\\pannel.png')
     game_world.add_object(court)
     game_world.add_object(net, 2)
+    game_world.add_object(pannel)
 
     player_1 = P1(500, 150, 'resource\\tennis_player_1.png')
     player_2 = P2(500, 750, 'resource\\tennis_player_2.png')
@@ -32,6 +34,9 @@ def init():
 
     referee = Referee()
     game_world.add_object(referee, 2)
+
+    game_world.add_collision_pair('pannel:ball', pannel, None)
+    game_world.add_collision_pair('pannel:ball', None, ball)
 
     game_world.add_collision_pair('player:ball', player_1, None)
     game_world.add_collision_pair('player:ball', player_2, None)
