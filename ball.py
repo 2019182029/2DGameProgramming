@@ -36,7 +36,7 @@ class Rally:
 
     @staticmethod
     def draw(ball):
-        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y + ball.z // 15, 25, 25)
+        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y + ball.z // 5, 25, 25)
         draw_rectangle(*ball.get_bb())
 
 
@@ -82,7 +82,7 @@ class Ball:
         self.state_machine.draw()
 
     def get_bb(self):
-        return self.x - 25, self.y + self.z // 15 - 25, self.x + 25, self.y + self.z // 15 + 25
+        return self.x - 25, self.y + self.z // 5 - 25, self.x + 25, self.y + self.z // 5 + 25
 
     def handle_collision(self, group, other):
         if group == 'player:ball':

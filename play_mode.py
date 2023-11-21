@@ -9,12 +9,13 @@ from player_2 import Player as P2
 from background import Background
 from ball import Ball
 from referee import Referee
+from shadow import Shadow
 
 
 def init():
     global court, net, pannel
     global player_1, player_2
-    global ball
+    global ball, shadow
     global referee
 
     court = Background('resource\\tennis_court.png')
@@ -30,7 +31,9 @@ def init():
     game_world.add_object(player_2, 1)
 
     ball = Ball()
+    shadow = Shadow()
     game_world.add_object(ball, 3)
+    game_world.add_object(shadow, 2)
 
     referee = Referee()
     game_world.add_object(referee, 2)
