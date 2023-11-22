@@ -38,21 +38,7 @@ class Rally:
 
     @staticmethod
     def draw(ball):
-        if 750 <= ball.x:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // 10),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
-        elif 625 <= ball.x < 750:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // 30),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
-        elif 375 <= ball.x < 625:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x,
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
-        elif 250 <= ball.x < 375:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // 30),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
-        elif ball.x < 250:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // 10),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 10), 25, 25)
+        ball.parabolic_motion()
         draw_rectangle(*ball.get_bb())
 
 
@@ -97,6 +83,29 @@ class Ball:
 
     def draw(self):
         self.state_machine.draw()
+
+    def parabolic_motion(self):
+        if 800 <= self.x:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 10),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif 700 <= self.x < 800:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 20),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif 600 <= self.x < 700:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 30),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif 400 <= self.x < 600:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x,
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif 300 <= self.x < 400:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 30),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif 200 <= self.x < 300:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 20),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+        elif self.x < 200:
+            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
 
     def get_bb(self):
         return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) - 25,
