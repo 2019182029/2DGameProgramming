@@ -4,7 +4,7 @@ import game_framework
 import game_world
 
 PIXEL_PER_METER = (10.0 / 0.06)
-RUN_SPEED_KMPH = 15.0
+RUN_SPEED_KMPH = 20.0
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -38,7 +38,12 @@ class Rally:
 
     @staticmethod
     def draw(ball):
-        ball.parabolic_motion()
+        if ball.x >= 400:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))), 25, 25)
+        elif ball.x < 400:
+            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))),
+                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // (50 - ((500 - ball.x) // 10))), 25, 25)
         draw_rectangle(*ball.get_bb())
 
 
@@ -73,7 +78,7 @@ class Ball:
         self.frame = 0
         self.frame_index = 0
         self.dir = 0
-        self.xdir, self.ydir, self.zdir = 0, 0, 1
+        self.xdir, self.ydir, self.zdir = 0.1, 0, 1
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -84,28 +89,28 @@ class Ball:
     def draw(self):
         self.state_machine.draw()
 
-    def parabolic_motion(self):
-        if 800 <= self.x:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 10),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif 700 <= self.x < 800:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 20),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif 600 <= self.x < 700:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 30),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif 400 <= self.x < 600:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x,
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif 300 <= self.x < 400:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 30),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif 200 <= self.x < 300:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 20),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-        elif self.x < 200:
-            self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10),
-                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    # def parabolic_motion(self):
+    #     if 800 <= self.x:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 10),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif 700 <= self.x < 800:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 20),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif 600 <= self.x < 700:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 30),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif 400 <= self.x < 600:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x,
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif 300 <= self.x < 400:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 30),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif 200 <= self.x < 300:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 20),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    #     elif self.x < 200:
+    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10),
+    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
 
     def get_bb(self):
         return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) - 25,
