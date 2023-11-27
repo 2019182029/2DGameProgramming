@@ -41,8 +41,8 @@ class Rally:
             case 4:
                 ball.frame = frames['Big']
 
-        if ball.z < 0 and ball.bounced == True:
-            ball.state_machine.handle_event(('Game_Over', None))
+        if ball.z < 0 and ball.zdir < 0 and ball.bounced == True:
+            ball.state_machine.handle_event(('Score', None))
 
         if ball.z < 0 and ball.zdir < 0:
             ball.zdir *= -1
@@ -56,13 +56,14 @@ class Rally:
         draw_rectangle(*ball.get_bb())
 
 
-class GameOver:
+class Score:
     @staticmethod
     def enter(ball, e):
+        ball.frame = frames['Small']
         ball.xdir *= 0.25
         ball.ydir *= 0.25
         ball.z = 0
-        ball.game_over_start_time = get_time()
+        ball.score_start_time = get_time()
 
     @staticmethod
     def exit(ball, e):
@@ -70,7 +71,7 @@ class GameOver:
 
     @staticmethod
     def do(ball):
-        if (get_time() - ball.game_over_start_time > 1):
+        if (get_time() - ball.score_start_time > 1):
             # game_framework.change_mode(select_mode)
             game_framework.quit()
 
@@ -87,7 +88,7 @@ class StateMachine:
         self.ball = ball
         self.cur_state = Rally
         self.transitions = {
-            Rally: {game_over: GameOver}
+            Rally: {game_over: Score}
         }
 
     def start(self):
@@ -116,7 +117,7 @@ class Ball:
         self.frame_index = 0
         self.dir = 0
         self.xdir, self.ydir, self.zdir = 0, 0, 1
-        self.game_over_start_time = 0
+        self.score_start_time = 0
         self.bounced = False
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
@@ -166,7 +167,7 @@ class Ball:
         if group == 'player:ball':
             self.bounced = False
             self.xdir = random.randint(-10, 10) / 200
-            if self.ydir == 0: self.ydir = 0.25
+            if self.ydir == 0: self.ydir = 0.5
             elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
                 self.ydir *= -1
             if self.zdir < 0: self.zdir *= -1

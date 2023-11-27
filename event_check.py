@@ -6,7 +6,7 @@ def cha_stop(e):
 
 
 def game_over(e):
-    return e[0] == 'Game_Over'
+    return e[0] == 'Score'
 
 
 
