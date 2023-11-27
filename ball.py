@@ -65,6 +65,8 @@ class Score:
         ball.z = 0
         ball.score_start_time = get_time()
 
+        game_world.collision_pairs['player:ball'][1].remove(ball)
+
     @staticmethod
     def exit(ball, e):
         pass
