@@ -92,7 +92,7 @@ class Run:
         if player.action == actions['Swing']:
             if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4: player.action = actions['Run']
 
-            if int(player.frame) == 2:
+            if 2 <= int(player.frame) <= 3:
                 if player.swing_dir == 'Right':
                     player.collision_xy = (player.x, player.y - 25, player.x + 50, player.y + 25)
                 elif player.swing_dir == 'Left':
@@ -104,12 +104,8 @@ class Run:
 
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         if not player.action == actions['Swing']:
-            if not player.xdir == 0:
-                if not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time >= 950 and \
-                   not player.x + RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time <= 50:
-                    player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
-            if not player.y + RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time >= 530:
-                player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
+            player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
+            player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
 
     @staticmethod
     def draw(player):
@@ -133,6 +129,8 @@ class StateMachine:
 
     def update(self):
         self.cur_state.do(self.player)
+        self.player.x = clamp(50.0, self.player.x, 950.0)
+        self.player.y = clamp(0.0, self.player.y, 530.0)
 
     def handle_event(self, e):
         for check_event, next_state in self.transitions[self.cur_state].items():
