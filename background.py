@@ -13,7 +13,7 @@ class Background:
         draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return 0, 825, 1000, 950
+        return 0, 800, 1000, 950
 
     def handle_collision(self, group, other):
         pass

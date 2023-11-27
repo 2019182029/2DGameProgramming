@@ -5,6 +5,13 @@ def cha_stop(e):
     return e[0] == 'CHA_STOPPED'
 
 
+def game_over(e):
+    return e[0] == 'Game_Over'
+
+
+
+
+
 # 1P event check
 
 def right_down(e):
@@ -41,6 +48,10 @@ def down_up(e):
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+
+
+
 
 # 2P event check
 

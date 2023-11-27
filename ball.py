@@ -1,8 +1,11 @@
 from pico2d import *
+from event_check import *
+
 import random
 import game_framework
 import game_world
 import play_mode
+import select_mode
 
 PIXEL_PER_METER = (10.0 / 0.06)
 RUN_SPEED_KMPH = 20.0
@@ -38,7 +41,13 @@ class Rally:
             case 4:
                 ball.frame = frames['Big']
 
-        if (ball.z // 100 < 0 and ball.zdir < 0) or (ball.z // 100 > 5 and ball.zdir > 0):
+        if ball.z < 0 and ball.bounced == True:
+            ball.state_machine.handle_event(('Game_Over', None))
+
+        if ball.z < 0 and ball.zdir < 0:
+            ball.zdir *= -1
+            ball.bounced = True
+        elif ball.z // 100 > 5 and ball.zdir > 0:
             ball.zdir *= -1
 
     @staticmethod
@@ -47,11 +56,39 @@ class Rally:
         draw_rectangle(*ball.get_bb())
 
 
+class GameOver:
+    @staticmethod
+    def enter(ball, e):
+        ball.xdir *= 0.25
+        ball.ydir *= 0.25
+        ball.z = 0
+        ball.game_over_start_time = get_time()
+
+    @staticmethod
+    def exit(ball, e):
+        pass
+
+    @staticmethod
+    def do(ball):
+        if (get_time() - ball.game_over_start_time > 1):
+            # game_framework.change_mode(select_mode)
+            game_framework.quit()
+
+        ball.x += ball.xdir * RUN_SPEED_PPS * game_framework.frame_time
+        ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
+
+    @staticmethod
+    def draw(ball):
+        ball.parabolic_motion()
+
+
 class StateMachine:
     def __init__(self, ball):
         self.ball = ball
         self.cur_state = Rally
-        self.transitions = {}
+        self.transitions = {
+            Rally: {game_over: GameOver}
+        }
 
     def start(self):
         self.cur_state.enter(self.ball, ('NONE', 0))
@@ -79,6 +116,8 @@ class Ball:
         self.frame_index = 0
         self.dir = 0
         self.xdir, self.ydir, self.zdir = 0, 0, 1
+        self.game_over_start_time = 0
+        self.bounced = False
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -125,8 +164,9 @@ class Ball:
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
+            self.bounced = False
             self.xdir = random.randint(-10, 10) / 200
-            if self.ydir == 0: self.ydir = 0.5
+            if self.ydir == 0: self.ydir = 0.25
             elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
                 self.ydir *= -1
             if self.zdir < 0: self.zdir *= -1
