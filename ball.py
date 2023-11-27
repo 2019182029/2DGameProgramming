@@ -30,20 +30,16 @@ class Rally:
         ball.dir = math.atan2(ball.x, ball.y)
 
         match ball.z // 100:
-            case -1: ball.zdir *= -1
             case 0: ball.frame = frames['Small']
             case 2: ball.frame = frames['Middle']
             case 4: ball.frame = frames['Big']
-            case 5: ball.zdir *= -1
+
+        if (ball.z // 100 < 0 and ball.zdir < 0) or (ball.z // 100 > 5 and ball.zdir > 0):
+            ball.zdir *= -1
 
     @staticmethod
     def draw(ball):
-        if ball.x >= 400:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x - math.cos(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))), 25, 25)
-        elif ball.x < 400:
-            ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x + math.cos(ball.dir + math.pi / 2) * (ball.z // (50 - ((ball.x - 500) // 10))),
-                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // (50 - ((500 - ball.x) // 10))), 25, 25)
+        ball.parabolic_motion()
         draw_rectangle(*ball.get_bb())
 
 
@@ -78,7 +74,8 @@ class Ball:
         self.frame = 0
         self.frame_index = 0
         self.dir = 0
-        self.xdir, self.ydir, self.zdir = 0.1, 0, 1
+        self.xdir, self.ydir, self.zdir = 0, 0, 1
+        self.hitted = False
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -89,41 +86,48 @@ class Ball:
     def draw(self):
         self.state_machine.draw()
 
-    # def parabolic_motion(self):
-    #     if 800 <= self.x:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 10),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif 700 <= self.x < 800:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 20),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif 600 <= self.x < 700:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x - math.cos(self.dir + math.pi / 2) * (self.z // 30),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif 400 <= self.x < 600:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x,
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif 300 <= self.x < 400:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 30),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif 200 <= self.x < 300:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 20),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
-    #     elif self.x < 200:
-    #         self.image.clip_draw(0, self.frame * 6, 6, 6, self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10),
-    #                              self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10), 25, 25)
+    def parabolic_motion(self):
+        if self.x > 500:
+            self.image.clip_draw(0, self.frame * 6, 6, 6,
+                                 self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10),
+                                 25, 25)
+        elif self.x < 500:
+            self.image.clip_draw(0, self.frame * 6, 6, 6,
+                                 self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)),
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10),
+                                 25, 25)
+        else:
+            self.image.clip_draw(0, self.frame * 6, 6, 6,
+                                 self.x,
+                                 self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10),
+                                 25, 25)
 
     def get_bb(self):
-        return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) - 25,
-                self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
-                self.x + math.cos(self.dir + math.pi / 2) * (self.z // 10) + 25,
-                self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
+        if self.x > 500:
+            return (self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) - 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
+                    self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) + 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
+        elif self.x < 500:
+            return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) - 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
+                    self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) + 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
+        else:
+            return (self.x - 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
+                    self.x + 25,
+                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
-            self.xdir = random.randint(-10, 10) / 200
-            self.ydir = 0.5 if self.ydir == 0 else self.ydir * -1
-            if self.zdir < 0: self.zdir *= -1
-        elif group == 'pannel:ball':
+            if self.hitted == False:
+                self.xdir = random.randint(-10, 10) / 200
+                self.ydir = 0.5 if self.ydir == 0 else self.ydir * -1
+                if self.zdir < 0: self.zdir *= -1
+            self.hitted = True
+        elif group == 'ball:pannel':
             self.ydir *= -1
-            game_world.overlap = False
+            self.hitted = False
 

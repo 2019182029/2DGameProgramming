@@ -38,8 +38,8 @@ def init():
     referee = Referee()
     game_world.add_object(referee, 2)
 
-    game_world.add_collision_pair('pannel:ball', pannel, None)
-    game_world.add_collision_pair('pannel:ball', None, ball)
+    game_world.add_collision_pair('ball:pannel', None, pannel)
+    game_world.add_collision_pair('ball:pannel', ball, None)
 
     game_world.add_collision_pair('player:ball', player_1, None)
     game_world.add_collision_pair('player:ball', player_2, None)
@@ -52,8 +52,8 @@ def finish():
 
 
 def update():
-    game_world.update()
     game_world.handle_collision()
+    game_world.update()
     referee.setheading(ball)
 
 

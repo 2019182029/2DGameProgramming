@@ -44,10 +44,10 @@ def collide(a, b):
 
     if la > rb: return False
     if ra < lb: return False
-    if ta < bb: overlap = False; return False
+    if ta < bb: return False
     if ba > tb: return False
 
-    if not overlap: overlap = True; return True
+    return True
 
 
 def add_collision_pair(group, a, b):
