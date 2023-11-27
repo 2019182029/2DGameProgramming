@@ -2,6 +2,7 @@ from pico2d import *
 import random
 import game_framework
 import game_world
+import play_mode
 
 PIXEL_PER_METER = (10.0 / 0.06)
 RUN_SPEED_KMPH = 20.0
@@ -30,9 +31,12 @@ class Rally:
         ball.dir = math.atan2(ball.x, ball.y)
 
         match ball.z // 100:
-            case 0: ball.frame = frames['Small']
-            case 2: ball.frame = frames['Middle']
-            case 4: ball.frame = frames['Big']
+            case 0:
+                ball.frame = frames['Small']
+            case 2:
+                ball.frame = frames['Middle']
+            case 4:
+                ball.frame = frames['Big']
 
         if (ball.z // 100 < 0 and ball.zdir < 0) or (ball.z // 100 > 5 and ball.zdir > 0):
             ball.zdir *= -1
@@ -75,7 +79,6 @@ class Ball:
         self.frame_index = 0
         self.dir = 0
         self.xdir, self.ydir, self.zdir = 0, 0, 1
-        self.hitted = False
         self.image = load_image('resource\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -122,12 +125,10 @@ class Ball:
 
     def handle_collision(self, group, other):
         if group == 'player:ball':
-            if self.hitted == False:
-                self.xdir = random.randint(-10, 10) / 200
-                self.ydir = 0.5 if self.ydir == 0 else self.ydir * -1
-                if self.zdir < 0: self.zdir *= -1
-            self.hitted = True
+            self.xdir = random.randint(-10, 10) / 200
+            if self.ydir == 0: self.ydir = 0.5
+            elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
+                self.ydir *= -1
+            if self.zdir < 0: self.zdir *= -1
         elif group == 'ball:pannel':
-            self.ydir *= -1
-            self.hitted = False
-
+            if self.ydir > 0: self.ydir *= -1
