@@ -10,27 +10,27 @@ import title_mode
 selection = {'CONTINUE': 225 * 2, 'RESTART': 225 * 2 - 71, 'RETURN_TO_TITLE': 225 * 2 - 142}
 
 def init():
-    global pannel
+    global pause_menu
     global arrow
     global pannel_continue
     global pannel_restart
     global pannel_returnToTitle
 
-    pannel = Pannel('resource\\pause.png', 250 * 2, 225 * 2, 750, 300)
+    pause_menu = Pannel('resource\\pause.png', 250 * 2, 225 * 2, 750, 300)
     arrow = Arrow('resource\\pause_arrow.png', 250 * 2, 225 * 2, 750, 300)
     pannel_continue = Pannel('resource\\pannel_continue.png', 250 * 2, 225 * 2, 750, 300)
     pannel_restart = Pannel('resource\\pannel_restart.png', 250 * 2, 225 * 2, 750, 300)
     pannel_returnToTitle = Pannel('resource\\pannel_return_to_title.png', 250 * 2, 225 * 2, 750, 300)
 
-    game_world.add_object(pannel, 4)
-    game_world.add_object(arrow, 4)
-    game_world.add_object(pannel_continue, 4)
-    game_world.add_object(pannel_restart, 4)
-    game_world.add_object(pannel_returnToTitle, 4)
+    game_world.add_object(pause_menu, 5)
+    game_world.add_object(arrow, 5)
+    game_world.add_object(pannel_continue, 5)
+    game_world.add_object(pannel_restart, 5)
+    game_world.add_object(pannel_returnToTitle, 5)
 
 
 def finish():
-    game_world.remove_object(pannel)
+    game_world.remove_object(pause_menu)
     game_world.remove_object(arrow)
     game_world.remove_object(pannel_continue)
     game_world.remove_object(pannel_restart)
@@ -63,9 +63,9 @@ def handle_events():
                 if arrow.y == selection['CONTINUE']:
                     game_framework.pop_mode()
                 elif arrow.y == selection['RESTART']:
-                    game_framework.pop_mode()
+                    while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
                     game_framework.change_mode(play_mode)
                 else:
-                    game_framework.pop_mode()
+                    while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
                     game_framework.change_mode(title_mode)
 

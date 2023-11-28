@@ -5,7 +5,7 @@ import random
 import game_framework
 import game_world
 import play_mode
-import select_mode
+import score_mode
 
 PIXEL_PER_METER = (10.0 / 0.06)
 RUN_SPEED_KMPH = 20.0
@@ -74,9 +74,8 @@ class Score:
     @staticmethod
     def do(ball):
         if (get_time() - ball.score_start_time > 1):
-            # game_framework.change_mode(select_mode)
+            game_framework.push_mode(score_mode)
             # game_framework.quit()
-            pass
 
         ball.x += ball.xdir * RUN_SPEED_PPS * game_framework.frame_time
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
