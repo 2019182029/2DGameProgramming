@@ -75,7 +75,8 @@ class Score:
     def do(ball):
         if (get_time() - ball.score_start_time > 1):
             # game_framework.change_mode(select_mode)
-            game_framework.quit()
+            # game_framework.quit()
+            pass
 
         ball.x += ball.xdir * RUN_SPEED_PPS * game_framework.frame_time
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
