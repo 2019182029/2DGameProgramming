@@ -2,6 +2,7 @@ from pico2d import *
 
 import game_world
 import select_mode
+import pause_mode
 import game_framework
 
 from player_1 import Player as P1
@@ -71,7 +72,7 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             # game_framework.change_mode(select_mode)
-            game_framework.quit()
+            game_framework.push_mode(pause_mode)
         else:
             player_1.handle_event(event)
             player_2.handle_event(event)
