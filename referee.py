@@ -7,7 +7,7 @@ class Referee:
     def __init__(self):
         self.x, self.y = 900, 550
         self.frame = direction['Middle']
-        self.image = load_image('resource\\referee.png')
+        self.image = load_image('resource\\objects\\referee.png')
 
     def update(self):
         pass

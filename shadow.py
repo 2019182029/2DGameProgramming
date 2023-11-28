@@ -4,7 +4,7 @@ import play_mode
 
 class Shadow:
     def __init__(self):
-        self.image = load_image('resource\\tennis_ball_shadow.png')
+        self.image = load_image('resource\\objects\\tennis_ball_shadow.png')
 
     def update(self):
         pass

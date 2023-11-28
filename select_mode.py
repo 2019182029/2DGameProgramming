@@ -13,17 +13,17 @@ mode_selection = {'PVE': 470, 'PVP': 358}
 
 
 def init():
-    global background
+    global select_menu
     global arrow
     global pannel_1
     global pannel_2
 
-    background = Background('resource\\selection.png')
-    arrow = Arrow('resource\\selection_arrow.png', 75, mode_selection['PVE'], 50, 50)
-    pannel_1 = Pannel('resource\\pannel_cpu.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
-    pannel_2 = Pannel('resource\\pannel_player.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    select_menu = Background('resource\\select_mode\\select_menu.png')
+    arrow = Arrow('resource\\select_mode\\select_arrow.png', 75, mode_selection['PVE'], 50, 50)
+    pannel_1 = Pannel('resource\\select_mode\\pannel_cpu.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    pannel_2 = Pannel('resource\\select_mode\\pannel_player.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
 
-    game_world.add_object(background)
+    game_world.add_object(select_menu)
     game_world.add_object(arrow, 1)
     game_world.add_object(pannel_1, 1)
     game_world.add_object(pannel_2, 1)

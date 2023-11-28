@@ -19,15 +19,15 @@ def init():
     global ball, shadow
     global referee
 
-    court = Background('resource\\tennis_court.png')
-    net = Background('resource\\net.png')
-    pannel = Background('resource\\pannel.png')
+    court = Background('resource\\play_mode\\court.png')
+    net = Background('resource\\play_mode\\net.png')
+    pannel = Background('resource\\play_mode\\pannel.png')
     game_world.add_object(court)
     game_world.add_object(net, 2)
     game_world.add_object(pannel)
 
-    player_1 = P1(500, 150, 'resource\\tennis_player_1.png')
-    player_2 = P2(500, 750, 'resource\\tennis_player_2.png')
+    player_1 = P1(500, 150, 'resource\\play_mode\\tennis_player_1.png')
+    player_2 = P2(500, 750, 'resource\\play_mode\\tennis_player_2.png')
     game_world.add_object(player_1, 4)
     game_world.add_object(player_2, 1)
 

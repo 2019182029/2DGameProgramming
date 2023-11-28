@@ -121,7 +121,7 @@ class Ball:
         self.xdir, self.ydir, self.zdir = 0, 0, 1
         self.score_start_time = 0
         self.bounced = False
-        self.image = load_image('resource\\tennis_ball.png')
+        self.image = load_image('resource\\objects\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 

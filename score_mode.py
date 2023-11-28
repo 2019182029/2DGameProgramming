@@ -11,7 +11,7 @@ def init():
     global score_board
     global score_mode_start_time
 
-    score_board = Pannel('resource\\score_board.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    score_board = Pannel('resource\\score_mode\\score_board.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
     score_mode_start_time = get_time()
 
     game_world.add_object(score_board, 4)

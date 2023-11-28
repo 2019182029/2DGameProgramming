@@ -7,13 +7,13 @@ import time
 
 
 def init():
-    global image
+    global title_menu
     global instruction
     global title_mode_start_time
     global instruction_display
 
-    image = load_image('resource\\title.png')
-    instruction = load_image('resource\\title_instruction.png')
+    title_menu = load_image('resource\\title_mode\\title_menu.png')
+    instruction = load_image('resource\\title_mode\\title_instruction.png')
 
     title_mode_start_time = time.time()
     instruction_display = True
@@ -34,7 +34,7 @@ def update():
 
 def draw():
     clear_canvas()
-    image.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    title_menu.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
     if instruction_display: instruction.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
     update_canvas()
 

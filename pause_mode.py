@@ -16,11 +16,11 @@ def init():
     global pannel_restart
     global pannel_returnToTitle
 
-    pause_menu = Pannel('resource\\pause.png', 250 * 2, 225 * 2, 750, 300)
-    arrow = Arrow('resource\\pause_arrow.png', 250 * 2, 225 * 2, 750, 300)
-    pannel_continue = Pannel('resource\\pannel_continue.png', 250 * 2, 225 * 2, 750, 300)
-    pannel_restart = Pannel('resource\\pannel_restart.png', 250 * 2, 225 * 2, 750, 300)
-    pannel_returnToTitle = Pannel('resource\\pannel_return_to_title.png', 250 * 2, 225 * 2, 750, 300)
+    pause_menu = Pannel('resource\\pause_mode\\pause_menu.png', 250 * 2, 225 * 2, 750, 300)
+    arrow = Arrow('resource\\pause_mode\\pause_arrow.png', 250 * 2, 225 * 2, 750, 300)
+    pannel_continue = Pannel('resource\\pause_mode\\pannel_continue.png', 250 * 2, 225 * 2, 750, 300)
+    pannel_restart = Pannel('resource\\pause_mode\\pannel_restart.png', 250 * 2, 225 * 2, 750, 300)
+    pannel_returnToTitle = Pannel('resource\\pause_mode\\pannel_return_to_title.png', 250 * 2, 225 * 2, 750, 300)
 
     game_world.add_object(pause_menu, 5)
     game_world.add_object(arrow, 5)
@@ -38,7 +38,18 @@ def finish():
 
 
 def update():
-    pass
+    if arrow.y == selection['CONTINUE']:
+        pannel_continue.x = 250 * 2 + 10
+        pannel_restart.x = 250 * 2
+        pannel_returnToTitle.x = 250 * 2
+    elif arrow.y == selection['RESTART']:
+        pannel_continue.x = 250 * 2
+        pannel_restart.x = 250 * 2 + 10
+        pannel_returnToTitle.x = 250 * 2
+    if arrow.y == selection['RETURN_TO_TITLE']:
+        pannel_continue.x = 250 * 2
+        pannel_restart.x = 250 * 2
+        pannel_returnToTitle.x = 250 * 2 + 10
 
 
 def draw():
