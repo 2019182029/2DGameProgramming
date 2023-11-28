@@ -1,13 +1,22 @@
+from pico2d import *
+
 import game_framework
 import select_mode
 import game_world
-from pico2d import *
+import time
 
 
 def init():
     global image
+    global instruction
+    global title_mode_start_time
+    global instruction_display
 
     image = load_image('resource\\title.png')
+    instruction = load_image('resource\\title_instruction.png')
+
+    title_mode_start_time = time.time()
+    instruction_display = True
 
 
 def finish():
@@ -15,12 +24,18 @@ def finish():
 
 
 def update():
-    game_world.update()
+    global title_mode_start_time
+    global instruction_display
 
+    game_world.update()
+    if time.time() - title_mode_start_time > 1.0:
+        instruction_display = True if instruction_display == False else False
+        title_mode_start_time = time.time()
 
 def draw():
     clear_canvas()
     image.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
+    if instruction_display: instruction.draw(250 * 2, 225 * 2, 250 * 4, 225 * 4)
     update_canvas()
 
 
