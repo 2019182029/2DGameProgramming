@@ -31,37 +31,21 @@ actions = {'Idle': 0, 'Run': 1, 'Stand': 2, 'Swing': 3, 'Serve_Ready': 4, 'Serve
 class Idle:
     @staticmethod
     def enter(player, e):
+        player.swing_frame = 0
+
         if player.action == actions['Swing']: return
 
         if player.face_dir == 'Right' or player.face_dir == 'Left': player.action = actions['Stand']
-        else: player.action = actions['Idle']
+        else: player.action = actions['Stand']
 
     @staticmethod
     def exit(player, e):
-        if mouse_click(e): player.swing()
+        pass
 
     @staticmethod
     def do(player):
-        if player.action == actions['Swing']:
-            if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4:
-                if player.x > COURT_WIDTH // 2 and player.swing_dir == 'Left':
-                    player.face_dir = 'Left'
-                    player.action = actions['Stand']
-                elif player.x <= COURT_WIDTH // 2 and player.swing_dir == 'Right':
-                    player.face_dir = 'Right'
-                    player.action = actions['Stand']
-                else: player.action = actions['Idle']
-
-            if int(player.frame) == 2:
-                if player.swing_dir == 'Left':
-                    player.collision_xy = (player.x + 25, player.y - 75, player.x + 75, player.y - 25)
-                elif player.swing_dir == 'Right':
-                    player.collision_xy = (player.x - 75, player.y - 75, player.x - 25, player.y - 25)
-
-            player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        else:
-            player.collision_xy = (0, 0, 0, 0)
-            player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 4
+        player.collision_xy = (0, 0, 0, 0)
+        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.25) % 4
 
     @staticmethod
     def draw(player):
@@ -75,42 +59,15 @@ class Idle:
 class Run:
     @staticmethod
     def enter(player, e):
-        if d_down(e) or a_up(e): player.xdir += 1
-        elif a_down(e) or d_up(e): player.xdir -= 1
-        if w_down(e) or s_up(e): player.ydir += 1
-        elif s_down(e) or w_up(e): player.ydir -= 1
-
-        player.dir = math.atan2(player.ydir, player.xdir)
-
-        if player.action == actions['Swing']: return
         player.action = actions['Run']
-
-        if player.xdir == 1: player.swing_dir = player.face_dir = 'Left'
-        elif player.xdir == -1: player.swing_dir = player.face_dir = 'Right'
 
     @staticmethod
     def exit(player, e):
-        if mouse_click(e): player.swing()
+        pass
 
     @staticmethod
     def do(player):
-        if player.action == actions['Swing']:
-            if player.frame + FRAMES_PER_TIME * game_framework.frame_time >= 4: player.action = actions['Run']
-
-            if int(player.frame) == 2:
-                if player.swing_dir == 'Left':
-                    player.collision_xy = (player.x + 25, player.y - 75, player.x + 75, player.y - 25)
-                elif player.swing_dir == 'Right':
-                    player.collision_xy = (player.x - 75, player.y - 75, player.x - 25, player.y - 25)
-        else: player.collision_xy = (0, 0, 0, 0)
-
-        if player.xdir == 0 and player.ydir == 0 and not player.action == actions['Swing']:
-            player.state_machine.handle_event(('CHA_STOPPED', None))
-
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if not player.action == actions['Swing']:
-            player.x += RUN_SPEED_PPS * math.cos(player.dir) * game_framework.frame_time
-            player.y += RUN_SPEED_PPS * math.sin(player.dir) * game_framework.frame_time
 
     @staticmethod
     def draw(player):
@@ -122,17 +79,13 @@ class Serve_Ready:
     def enter(player, e):
         player.action = actions['Serve_Ready']
 
-        if d_down(e) or a_up(e): player.xdir += 1
-        elif a_down(e) or d_up(e): player.xdir -= 1
-
     @staticmethod
     def exit(player, e):
-        if mouse_click(e): player.xdir = 0
+        pass
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        player.x += player.xdir * RUN_SPEED_PPS * game_framework.frame_time
+        pass
 
     @staticmethod
     def draw(player):
@@ -143,7 +96,6 @@ class Serve_Do:
     @staticmethod
     def enter(player, e):
         player.action = actions['Serve_Do']
-        player.swing_dir = 'Left' if player.x >= 500 else 'Right'
 
     @staticmethod
     def exit(player, e):
@@ -151,7 +103,7 @@ class Serve_Do:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+        pass
 
     @staticmethod
     def draw(player):
@@ -172,9 +124,12 @@ class Serve_Swing:
     def do(player):
         if player.frame + FRAMES_PER_TIME * game_framework.frame_time > FRAMES_PER_ACTION:
             player.state_machine.handle_event(('GAME_START', None))
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.75) % 4
-        if 1 <= int(player.frame) <= 2:
-            player.collision_xy = (player.x - 50, player.y + 50, player.x, player.y + 100)
+            return BehaviorTree.SUCCESS
+        else:
+            player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+            if 1 <= int(player.frame) <= 2:
+                player.collision_xy = (player.x - 50, player.y + 50, player.x, player.y + 100)
+            return BehaviorTree.RUNNING
 
     @staticmethod
     def draw(player):
@@ -186,11 +141,11 @@ class StateMachine:
         self.player = player
         self.cur_state = Serve_Ready if play_mode.serve == 'player_2' else Idle
         self.transitions = {
-            Idle: {},
-            Run: {},
+            Idle: {cpu_run: Run},
+            Run: {cpu_swung: Idle},
             Serve_Ready: {cpu_serve_start: Serve_Do},
-            Serve_Do: {},
-            Serve_Swing: {}
+            Serve_Do: {cpu_serve_swing_start: Serve_Swing},
+            Serve_Swing: {game_start: Idle}
         }
 
     def start(self):
@@ -216,7 +171,6 @@ class StateMachine:
 
 class Player:
     def __init__(self, x, y, image):
-        self.c = None
         self.x, self.y = x, y
         self.tx, self.ty = 1000, 1000
         self.collision_xy = (0, 0, 0, 0)
@@ -225,9 +179,9 @@ class Player:
         self.action = actions['Idle']
 
         self.dir = 0
-        self.xdir, self.ydir = 0, 0
         self.face_dir = 'Middle'
         self.swing_dir = 'Right'
+        self.swing_frame = 0
 
         self.image = load_image(image)
         self.state_machine = StateMachine(self)
@@ -243,16 +197,15 @@ class Player:
             int(self.frame) * 23, self.action * 40, 23, 40, self.x, self.y, width, height)
 
     def update(self):
-        self.swing_dir = 'Left' if self.x >= 500 else 'Right'
+        self.state_machine.update()
         self.bt.run()
 
-    def draw(self):
-        if self.face_dir == 'Right' or self.face_dir == 'Middle': self.draw_player()
-        elif self.face_dir == 'Left': self.composite_draw_player()
-        draw_rectangle(*self.collision_xy)
-
     def handle_event(self, event):
-        pass
+        self.state_machine.handle_event(('INPUT', event))
+
+    def draw(self):
+        self.state_machine.draw()
+        # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         return self.collision_xy
@@ -274,51 +227,45 @@ class Player:
         return distance2 < (PIXEL_PER_METER * r) ** 2
 
     def should_serve(self):
-        if self.state_machine.cur_state == Serve_Ready: return BehaviorTree.SUCCESS
+        if self.state_machine.cur_state == Serve_Ready or self.state_machine.cur_state == Serve_Do or self.state_machine.cur_state == Serve_Swing:
+            return BehaviorTree.SUCCESS
         else: return BehaviorTree.FAIL
 
     def set_random_location(self):
-        self.tx, self.ty = random.randint(200, 800 + 1), 800
+        if self.state_machine.cur_state == Serve_Ready: self.tx, self.ty = random.randint(200, 400), 800
         return BehaviorTree.SUCCESS
 
     def move_to(self, r = 0.1):
-        self.action = actions['Run']
+        if self.state_machine.cur_state != Serve_Ready and self.state_machine.cur_state != Serve_Do and self.state_machine.cur_state != Serve_Swing:
+            self.state_machine.handle_event(('CPU_RUN', None))
         self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.5) % 4
+        if self.distance_less_than(self.tx, self.ty, self.x, self.y, r):
+            play_mode.ball.state_machine.handle_event(('CPU_SERVE_START', None))
+            return BehaviorTree.SUCCESS
         self.move_slightly_to(self.tx, self.ty)
-        if self.distance_less_than(self.tx, self.ty, self.x, self.y, r): return BehaviorTree.SUCCESS
-        else: return BehaviorTree.RUNNING
+        return BehaviorTree.RUNNING
 
     def do_serve_toss(self):
         self.state_machine.handle_event(('CPU_SERVE_START', None))
-        if play_mode.ball.zdir < 0 and :
-            return BehaviorTree.SUCCESS
+        if play_mode.ball.zdir < 0 and play_mode.ball.z // 75 <= 2: return BehaviorTree.SUCCESS
         else: return BehaviorTree.RUNNING
 
     def do_serve_swing(self):
-        self.action = actions['Serve_Swing']
-        if play_mode.ball.z // 75 <= 2 or int(self.frame) != 0:
-            self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
-        if 1 <= int(self.frame) <= 2:
-            self.collision_xy = (self.x - 50, self.y + 50, self.x, self.y + 100)
-        if self.frame + FRAMES_PER_TIME * game_framework.frame_time > FRAMES_PER_ACTION:
-            # play_mode.serve = 'player_1'
-            self.swung += 1
-            return BehaviorTree.SUCCESS
-        else: return BehaviorTree.RUNNING
+        self.state_machine.handle_event(('CPU_SERVE_SWING_START', None))
 
     def is_ball_hitted(self):
-        if play_mode.ball.last_hitted_by == 'player_1':
-            self.c = (700 - play_mode.ball.y) / (play_mode.ball.ydir * ball.RUN_SPEED_PPS * game_framework.frame_time)
         if play_mode.ball.last_hitted_by == 'player_1': return BehaviorTree.SUCCESS
         else: return BehaviorTree.FAIL
 
     def set_target_location(self):
-        if self.c != None:
-            if play_mode.ball.x + play_mode.ball.xdir * self.c >= 500:
-                self.tx = play_mode.ball.x + play_mode.ball.xdir * self.c - 50
-            else: self.tx = play_mode.ball.x + play_mode.ball.xdir * self.c + 50
-            self.ty = random.randint(650, 850)
-            self.c = None
+        if play_mode.ball.c != None:
+            if play_mode.ball.tx >= 500:
+                self.tx = play_mode.ball.tx - 25
+                self.swing_dir = 'Left'
+            else:
+                self.tx = play_mode.ball.tx + 25
+                self.swing_dir = 'Right'
+            self.ty = play_mode.ball.ty
         return BehaviorTree.SUCCESS
 
     def is_ball_nearby(self, r):
@@ -331,34 +278,36 @@ class Player:
 
     def do_swing(self):
         self.action = actions['Swing']
-        self.collision_xy = (0, 0, 0, 0)
 
-        if self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.75 > 4:
+        if self.swing_frame == 0:
+            self.frame = 0
+            self.swing_frame += 1
+
+        if self.frame + FRAMES_PER_TIME * game_framework.frame_time > 4:
+            self.state_machine.handle_event(('CPU_SWUNG', None))
             return BehaviorTree.SUCCESS
-
-        self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.75) % FRAMES_PER_ACTION
-
-        if self.face_dir == 'Middle': self.swing_dir = 'Left' if self.x > COURT_WIDTH // 2 else 'Right'
 
         if int(self.frame) == 2:
             if self.swing_dir == 'Left':
                 self.collision_xy = (self.x + 25, self.y - 75, self.x + 75, self.y - 25)
             elif self.swing_dir == 'Right':
                 self.collision_xy = (self.x - 75, self.y - 75, self.x - 25, self.y - 25)
+        else:
+            self.collision_xy = (0, 0, 0, 0)
 
-        # self.frame = (self.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         return BehaviorTree.RUNNING
 
     def do_Idle(self):
-        self.frame = 0
-        self.collision_xy = (0, 0, 0, 0)
+        self.state_machine.handle_event(('GAME_START', None))
+
         if self.x > COURT_WIDTH // 2 and self.swing_dir == 'Left':
             self.face_dir = 'Left'
             self.action = actions['Stand']
         elif self.x <= COURT_WIDTH // 2 and self.swing_dir == 'Right':
             self.face_dir = 'Right'
             self.action = actions['Stand']
-        else: self.action = actions['Idle']
+        else: self.action = actions['Stand']
+
         return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):

@@ -14,7 +14,7 @@ from referee import Referee
 from shadow import Shadow
 from bubble import Bubble
 
-serve = 'player_2'
+serve = 'player_1'
 game_mode = None
 
 def init():

@@ -1,7 +1,7 @@
 from pico2d import open_canvas, close_canvas
-import select_mode as start_mode
+import select_mode
 import play_mode
-import title_mode
+import title_mode as start_mode
 import score_mode
 import game_framework
 

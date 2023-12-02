@@ -109,3 +109,11 @@ def p2_mouse_click(e):
 def cpu_serve_start(e):
     return e[0] == 'CPU_SERVE_START'
 
+def cpu_serve_swing_start(e):
+    return e[0] == 'CPU_SERVE_SWING_START'
+
+def cpu_swung(e):
+    return e[0] == 'CPU_SWUNG'
+
+def cpu_run(e):
+    return e[0] == 'CPU_RUN'

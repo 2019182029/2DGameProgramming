@@ -177,7 +177,7 @@ class StateMachine:
         self.transitions = {
             Rally: {game_over: Score},
             Score: {},
-            Serve_Ready: {p1_space_down: Serve_Do, p2_mouse_click: Serve_Do, cpu_swing: Serve_Do},
+            Serve_Ready: {p1_space_down: Serve_Do, p2_mouse_click: Serve_Do, cpu_serve_start: Serve_Do},
             Serve_Do: {game_start: Rally, game_over: Score}
         }
 
@@ -202,7 +202,9 @@ class StateMachine:
 
 class Ball:
     def __init__(self):
+        self.c = None
         self.x, self.y, self.z = 500, 250, 0
+        self.tx, self.ty = 0, 0
         self.dir = 0
         self.xdir, self.ydir, self.zdir = 0, 0, 1
 
@@ -229,6 +231,7 @@ class Ball:
 
     def draw(self):
         self.state_machine.draw()
+        # draw_rectangle(self.tx - 5, self.ty - 5, self.tx + 5, self.ty + 5)
 
     def handle_event(self, event):
         self.state_machine.handle_event(('INPUT', event))
@@ -274,8 +277,8 @@ class Ball:
         # else: return (self.x - 25, calculated_y - 25, self.x + 25, calculated_y + 25)
 
     def handle_collision(self, group, other):
-        if self.state_machine.cur_state == Serve_Do:
-            if group == 'player:ball':
+        if group == 'player:ball':
+            if self.state_machine.cur_state == Serve_Do:
                 if self.zdir > 0:
                     if play_mode.serve == 'player_1': score_mode.p2_score_num += 1
                     else: score_mode.p1_score_num += 1
@@ -285,7 +288,6 @@ class Ball:
                 self.rally_sound.play()
                 self.state_machine.handle_event(('GAME_START', None))
 
-        if group == 'player:ball':
             self.bounced = False
             if play_mode.game_mode == 'PVP':
                 is_serve = other.state_machine.cur_state == SS1 or other.state_machine.cur_state == SS2
@@ -301,7 +303,7 @@ class Ball:
                     self.xdir = -0.25 if play_mode.p2.swing_dir == 'Left' else 0.25
                     self.last_hitted_by = 'player_2'
                     self.rally_sound.play()
-
+                    self.c = None
             else:
                 if other == play_mode.player_1:
                     self.xdir = 0.05 if play_mode.player_1.swing_dir == 'Left' else -0.05
@@ -311,13 +313,20 @@ class Ball:
                     self.xdir = -0.05 if play_mode.p2.swing_dir == 'Left' else 0.05
                     self.last_hitted_by = 'player_2'
                     self.rally_sound.play()
+                    self.c = None
 
             if self.ydir == 0: self.ydir = 0.5
-            elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.p2):
-                self.ydir *= -1
+            elif self.ydir < 0 and other == play_mode.player_1:
+                self.ydir = 0.5
+            elif self.ydir > 0 and other == play_mode.p2:
+                self.ydir = -0.5
+
+            if other == play_mode.player_1:
+                self.c = (800 - self.y) / (self.ydir * RUN_SPEED_PPS * game_framework.frame_time)
+                self.tx = self.x + self.xdir * RUN_SPEED_PPS * game_framework.frame_time * self.c
+                self.ty = self.y + self.ydir * RUN_SPEED_PPS * game_framework.frame_time * self.c
 
             if self.zdir < 0: self.zdir *= -1
-
         elif group == 'ball:pannel':
             if self.last_hitted_by == 'player_1':
                 self.wall_bounded = True
