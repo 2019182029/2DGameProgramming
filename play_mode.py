@@ -7,13 +7,14 @@ import game_framework
 
 from player_1 import Player as P1
 from player_2 import Player as P2
+from player_cpu import Player as CPU
 from background import Background
 from ball import Ball
 from referee import Referee
 from shadow import Shadow
 from bubble import Bubble
 
-serve = 'player_1'
+serve = 'player_2'
 game_mode = None
 
 def init():
@@ -33,21 +34,20 @@ def init():
     player_1 = P1(500, 150, 'resource\\objects\\tennis_player_1.png')
     game_world.add_object(player_1, 4)
 
-    if game_mode == 'PVP':
-        player_2 = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
-        p2 = player_2
-        game_world.add_object(player_2, 1)
-        game_world.add_collision_pair('player:ball', player_2, None)
-    else:
-        player_cpu = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
-        p2 = player_cpu
-        game_world.add_object(player_cpu, 1)
-        game_world.add_collision_pair('player:ball', player_cpu, None)
-
     ball = Ball()
     shadow = Shadow()
     game_world.add_object(ball, 3)
     game_world.add_object(shadow, 2)
+
+    if game_mode == 'PVP':
+        player_2 = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
+        p2 = player_2
+    else:
+        player_cpu = CPU(500, 800, 'resource\\objects\\tennis_player_2.png')
+        p2 = player_cpu
+
+    game_world.add_object(p2, 1)
+    game_world.add_collision_pair('player:ball', p2, None)
 
     referee = Referee('resource\\objects\\referee.png')
     bubble = Bubble('resource\\objects\\speech_bubble.png')

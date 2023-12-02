@@ -30,6 +30,12 @@ class Rally:
 
     @staticmethod
     def do(ball):
+        if play_mode.bubble.frame == judgment['OUT']:
+            ball.ydir *= 0.25
+            if ball.last_hitted_by == 'player_1': score_mode.p2_score_num += 1
+            else: score_mode.p1_score_num += 1
+            ball.state_machine.handle_event(('Score', None))
+
         ball.x += ball.xdir * RUN_SPEED_PPS * game_framework.frame_time
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
         ball.z += ball.zdir * RUN_SPEED_PPS * game_framework.frame_time
@@ -171,7 +177,7 @@ class StateMachine:
         self.transitions = {
             Rally: {game_over: Score},
             Score: {},
-            Serve_Ready: {p1_space_down: Serve_Do, p2_mouse_click: Serve_Do},
+            Serve_Ready: {p1_space_down: Serve_Do, p2_mouse_click: Serve_Do, cpu_swing: Serve_Do},
             Serve_Do: {game_start: Rally, game_over: Score}
         }
 
@@ -281,8 +287,12 @@ class Ball:
 
         if group == 'player:ball':
             self.bounced = False
+            if play_mode.game_mode == 'PVP':
+                is_serve = other.state_machine.cur_state == SS1 or other.state_machine.cur_state == SS2
+            else:
+                is_serve = play_mode.player_1.state_machine.cur_state == SS1 or play_mode.player_cpu.action == 6
 
-            if other.state_machine.cur_state == SS1 or other.state_machine.cur_state == SS2:
+            if is_serve:
                 if other == play_mode.player_1:
                     self.xdir = 0.25 if play_mode.player_1.swing_dir == 'Left' else -0.25
                     self.last_hitted_by = 'player_1'

@@ -64,7 +64,7 @@ def p1_space_down(e):
 
 
 
-# 2P event check
+# 2P, CPU event check
 
 def d_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d
@@ -105,3 +105,7 @@ def mouse_click(e):
 def p2_mouse_click(e):
     return (e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN and e[1].button == SDL_BUTTON_LEFT
             and play_mode.serve == 'player_2')
+
+def cpu_serve_start(e):
+    return e[0] == 'CPU_SERVE_START'
+
