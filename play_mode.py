@@ -11,6 +11,7 @@ from background import Background
 from ball import Ball
 from referee import Referee
 from shadow import Shadow
+from bubble import Bubble
 
 serve = 'player_1'
 
@@ -19,6 +20,7 @@ def init():
     global player_1, player_2
     global ball, shadow
     global referee
+    global bubble
 
     court = Background('resource\\play_mode\\court.png')
     net = Background('resource\\play_mode\\net.png')
@@ -37,8 +39,10 @@ def init():
     game_world.add_object(ball, 3)
     game_world.add_object(shadow, 2)
 
-    referee = Referee()
+    referee = Referee('resource\\objects\\referee.png')
+    bubble = Bubble('resource\\objects\\speech_bubble.png')
     game_world.add_object(referee, 2)
+    game_world.add_object(bubble, 4)
 
     game_world.add_collision_pair('ball:pannel', None, pannel)
     game_world.add_collision_pair('ball:pannel', ball, None)
@@ -58,7 +62,6 @@ def finish():
 def update():
     game_world.handle_collision()
     game_world.update()
-    referee.setheading(ball)
 
 
 def draw():

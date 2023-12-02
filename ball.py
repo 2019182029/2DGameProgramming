@@ -16,6 +16,7 @@ RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 frames = {'Big': 0, 'Middle': 1, 'Small': 2}
+judgment = {'IN': 0, 'OUT': 1, 'FAULT': 2}
 
 
 class Rally:
@@ -49,8 +50,14 @@ class Rally:
         if ball.z < 0 and ball.zdir < 0:
             ball.zdir *= -1
             ball.bounced = True
+            if ball.in_out(): play_mode.bubble.frame = judgment['IN']
+            else: play_mode.bubble.frame = judgment['OUT']
         elif ball.z // 100 > 5 and ball.zdir > 0:
             ball.zdir *= -1
+
+        if ball.y < -5:
+            ball.xdir, ball.ydir, ball.zdir = 0, 0, 0
+            ball.state_machine.handle_event(('Score', None))
 
     @staticmethod
     def draw(ball):
@@ -133,6 +140,7 @@ class Serve_Do:
             ball.zdir *= -1
 
         if ball.z < 0 and ball.zdir < 0:
+            play_mode.bubble.frame = judgment['FAULT']
             ball.state_machine.handle_event(('Score', None))
 
     @staticmethod
@@ -213,6 +221,14 @@ class Ball:
                                  self.x,
                                  self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10),
                                  25, 25)
+
+    def in_out(self):
+        if 140 <= self.x < 840 and 80 <= self.y < 280: return True
+        if 200 <= self.x < 780 and 280 <= self.y < 475: return True
+        if 240 <= self.x < 740 and 475 <= self.y < 670: return True
+        if 280 <= self.x < 700 and 670 <= self.y < 870: return True
+
+        return False
 
     def get_bb(self):
         calculated_x_1 = self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10))
