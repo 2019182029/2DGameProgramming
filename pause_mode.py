@@ -74,9 +74,11 @@ def handle_events():
                 if arrow.y == selection['CONTINUE']:
                     game_framework.pop_mode()
                 elif arrow.y == selection['RESTART']:
+                    play_mode.serve = 'player_2'
                     while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
                     game_framework.change_mode(play_mode)
                 else:
+                    play_mode.serve = 'player_2'
                     while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
                     game_framework.change_mode(title_mode)
 

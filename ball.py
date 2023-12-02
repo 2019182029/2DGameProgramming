@@ -45,6 +45,8 @@ class Rally:
                 ball.frame = frames['Big']
 
         if ball.z < 0 and ball.zdir < 0 and ball.bounced == True:
+            if play_mode.bubble.frame != judgment['OUT']: score_mode.p1_score_num += 1
+            else: score_mode.p2_score_num += 1
             ball.state_machine.handle_event(('Score', None))
 
         if ball.z < 0 and ball.zdir < 0:
@@ -57,6 +59,8 @@ class Rally:
 
         if ball.y < -5:
             ball.xdir, ball.ydir, ball.zdir = 0, 0, 0
+            if play_mode.bubble.frame != judgment['OUT']: score_mode.p2_score_num += 1
+            else: score_mode.p1_score_num += 1
             ball.state_machine.handle_event(('Score', None))
 
     @staticmethod
@@ -141,6 +145,8 @@ class Serve_Do:
 
         if ball.z < 0 and ball.zdir < 0:
             play_mode.bubble.frame = judgment['FAULT']
+            if play_mode.serve == 'player_1': score_mode.p1_score_num += 1
+            else: score_mode.p2_score_num += 1
             ball.state_machine.handle_event(('Score', None))
 
     @staticmethod
