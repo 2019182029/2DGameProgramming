@@ -1,6 +1,7 @@
 from pico2d import *
 from event_check import *
-from player_1 import Serve_Swing as SS
+from player_1 import Serve_Swing as SS1
+from player_2 import Serve_Swing as SS2
 
 import random
 import game_framework
@@ -234,12 +235,12 @@ class Ball:
         if group == 'player:ball':
             self.bounced = False
 
-            if other.state_machine.cur_state == SS:
+            if other.state_machine.cur_state == SS1 or other.state_machine.cur_state == SS2:
                 if other == play_mode.player_1:
                     self.xdir = 0.25 if play_mode.player_1.swing_dir == 'Left' else -0.25
                     self.last_hitted_by = 'player_1'
                 else:
-                    self.xdir = -0.1 if play_mode.player_2.swing_dir == 'Left' else 0.1
+                    self.xdir = -0.25 if play_mode.player_2.swing_dir == 'Left' else 0.25
                     self.last_hitted_by = 'player_2'
 
             else:

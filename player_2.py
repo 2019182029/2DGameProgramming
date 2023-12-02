@@ -139,6 +139,7 @@ class Serve_Do:
     @staticmethod
     def enter(player, e):
         player.action = actions['Serve_Do']
+        player.swing_dir = 'Left' if player.x >= 500 else 'Right'
 
     @staticmethod
     def exit(player, e):

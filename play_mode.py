@@ -22,7 +22,7 @@ def init():
 
     court = Background('resource\\play_mode\\court.png')
     net = Background('resource\\play_mode\\net.png')
-    pannel = Background('resource\\play_mode\\pannel.png')
+    pannel = Background('resource\\play_mode\\pannel.png', (0, 800, 1000, 950))
     game_world.add_object(court)
     game_world.add_object(net, 2)
     game_world.add_object(pannel)

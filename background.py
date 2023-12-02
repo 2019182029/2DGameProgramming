@@ -2,8 +2,9 @@ from pico2d import *
 
 
 class Background:
-    def __init__(self, image):
+    def __init__(self, image, bb = None):
         self.image = load_image(image)
+        self.bb = bb
 
     def update(self):
         pass
@@ -13,7 +14,7 @@ class Background:
         # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
-        return 0, 800, 1000, 950
+        return self.bb
 
     def handle_collision(self, group, other):
         pass
