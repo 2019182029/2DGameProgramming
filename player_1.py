@@ -140,6 +140,7 @@ class Serve_Do:
     @staticmethod
     def enter(player, e):
         player.action = actions['Serve_Do']
+        player.swing_dir = 'Right' if player.x >= 500 else 'Left'
 
     @staticmethod
     def exit(player, e):
@@ -253,7 +254,7 @@ class Player:
 
     def draw(self):
         self.state_machine.draw()
-        draw_rectangle(*self.get_bb())
+        # draw_rectangle(*self.get_bb())
 
     def get_bb(self):
         return self.collision_xy

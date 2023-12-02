@@ -12,7 +12,7 @@ from ball import Ball
 from referee import Referee
 from shadow import Shadow
 
-serve = 'player_2'
+serve = 'player_1'
 
 def init():
     global court, net, pannel

@@ -1,5 +1,6 @@
 from pico2d import *
 from event_check import *
+from player_1 import Serve_Swing as SS
 
 import random
 import game_framework
@@ -53,7 +54,7 @@ class Rally:
     @staticmethod
     def draw(ball):
         ball.parabolic_motion()
-        draw_rectangle(*ball.get_bb())
+        # draw_rectangle(*ball.get_bb())
 
 
 class Score:
@@ -139,7 +140,7 @@ class Serve_Do:
                                 ball.x,
                                 ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 5),
                                 25, 25)
-        draw_rectangle(*ball.get_bb())
+        # draw_rectangle(*ball.get_bb())
 
 
 class StateMachine:
@@ -181,6 +182,7 @@ class Ball:
         self.xdir, self.ydir, self.zdir = 0, 0, 1
         self.score_start_time = 0
         self.bounced = False
+        self.last_hitted_by = 'player_2'
         self.image = load_image('resource\\objects\\tennis_ball.png')
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -232,10 +234,21 @@ class Ball:
         if group == 'player:ball':
             self.bounced = False
 
-            if other == play_mode.player_1:
-                self.xdir = 0.05 if play_mode.player_1.swing_dir == 'Left' else -0.05
+            if other.state_machine.cur_state == SS:
+                if other == play_mode.player_1:
+                    self.xdir = 0.25 if play_mode.player_1.swing_dir == 'Left' else -0.25
+                    self.last_hitted_by = 'player_1'
+                else:
+                    self.xdir = -0.1 if play_mode.player_2.swing_dir == 'Left' else 0.1
+                    self.last_hitted_by = 'player_2'
+
             else:
-                self.xdir = -0.05 if play_mode.player_2.swing_dir == 'Left' else 0.05
+                if other == play_mode.player_1:
+                    self.xdir = 0.05 if play_mode.player_1.swing_dir == 'Left' else -0.05
+                    self.last_hitted_by = 'player_1'
+                else:
+                    self.xdir = -0.05 if play_mode.player_2.swing_dir == 'Left' else 0.05
+                    self.last_hitted_by = 'player_2'
 
             if self.ydir == 0: self.ydir = 0.5
             elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
@@ -244,4 +257,6 @@ class Ball:
             if self.zdir < 0: self.zdir *= -1
 
         elif group == 'ball:pannel':
-            if self.ydir > 0: self.ydir *= -1
+            if self.last_hitted_by == 'player_1':
+                if self.ydir > 0: self.ydir *= -0.25
+                if self.zdir > 0: self.zdir *= -1
