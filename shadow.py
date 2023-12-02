@@ -1,4 +1,6 @@
 from pico2d import *
+from ball import Rally
+
 import play_mode
 
 
@@ -10,4 +12,5 @@ class Shadow:
         pass
 
     def draw(self):
-        self.image.clip_draw(0, play_mode.ball.frame * 6, 6, 6, play_mode.ball.x, play_mode.ball.y, 25, 25)
+        if play_mode.ball.state_machine.cur_state == Rally:
+            self.image.clip_draw(0, play_mode.ball.frame * 6, 6, 6, play_mode.ball.x, play_mode.ball.y, 25, 25)

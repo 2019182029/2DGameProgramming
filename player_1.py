@@ -187,7 +187,7 @@ class StateMachine:
             Run: {right_down: Run, left_down: Run, right_up: Run, left_up: Run,
                   up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stop: Idle, space_down: Run},
             Serve_Ready: {right_down: Serve_Ready, left_down: Serve_Ready, right_up: Serve_Ready, left_up: Serve_Ready,
-                           space_down: Serve_Do},
+                          space_down: Serve_Do},
             Serve_Do: {space_down: Serve_Swing},
             Serve_Swing: {game_start: Idle}
         }

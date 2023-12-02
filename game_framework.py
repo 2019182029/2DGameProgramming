@@ -4,7 +4,7 @@ running = None
 stack = None
 
 
-def change_mode(mode):
+def change_mode(mode, serve = None):
     global stack
     if (len(stack) > 0):
         # execute the current mode's finish function

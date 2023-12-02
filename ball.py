@@ -74,7 +74,7 @@ class Score:
     @staticmethod
     def do(ball):
         if (get_time() - ball.score_start_time > 1):
-            # game_framework.push_mode(score_mode)
+            game_framework.push_mode(score_mode)
             # game_framework.quit()
             pass
 
@@ -86,12 +86,71 @@ class Score:
         ball.parabolic_motion()
 
 
+class Serve_Ready:
+    @staticmethod
+    def enter(ball, e):
+        ball.frame = frames['Small']
+
+    @staticmethod
+    def exit(ball, e):
+        pass
+
+    @staticmethod
+    def do(ball):
+        if play_mode.serve == 'player_1': ball.x, ball.y = play_mode.player_1.x + 35, play_mode.player_1.y + 20
+        else: ball.x, ball.y = play_mode.player_2.x - 15, play_mode.player_2.y - 15
+
+    @staticmethod
+    def draw(ball):
+        ball.image.clip_draw(0, ball.frame * 6, 6, 6, ball.x, ball.y, 25, 25)
+
+
+class Serve_Do:
+    @staticmethod
+    def enter(ball, e):
+        if play_mode.serve == 'player_1': ball.x, ball.y = play_mode.player_1.x + 38, play_mode.player_1.y + 50
+        else: ball.x, ball.y = play_mode.player_2.x - 10, play_mode.player_2.y + 18
+
+    @staticmethod
+    def exit(ball, e):
+        pass
+
+    @staticmethod
+    def do(ball):
+        ball.z += ball.zdir * RUN_SPEED_PPS * game_framework.frame_time
+
+        match ball.z // 100:
+            case 0:
+                ball.frame = frames['Small']
+            case 2:
+                ball.frame = frames['Middle']
+            case 4:
+                ball.frame = frames['Big']
+
+        if ball.z // 100 > 5 and ball.zdir > 0:
+            ball.zdir *= -1
+
+        if ball.z < 0 and ball.zdir < 0:
+            ball.state_machine.handle_event(('Score', None))
+
+    @staticmethod
+    def draw(ball):
+        ball.image.clip_draw(0, ball.frame * 6, 6, 6,
+                                ball.x,
+                                ball.y + math.sin(ball.dir + math.pi / 2) * (ball.z // 5),
+                                25, 25)
+        draw_rectangle(*ball.get_bb())
+
+
 class StateMachine:
     def __init__(self, ball):
         self.ball = ball
-        self.cur_state = Rally
+        self.cur_state = Serve_Ready
         self.transitions = {
-            Rally: {game_over: Score}
+            Rally: {game_over: Score},
+            Score: {},
+            Serve_Ready: {space_down: Serve_Do, mouse_click: Serve_Do},
+            Serve_Do: {game_start: Rally, game_over: Score}
         }
 
     def start(self):
@@ -132,6 +191,9 @@ class Ball:
     def draw(self):
         self.state_machine.draw()
 
+    def handle_event(self, event):
+        self.state_machine.handle_event(('INPUT', event))
+
     def parabolic_motion(self):
         if self.x > 500:
             self.image.clip_draw(0, self.frame * 6, 6, 6,
@@ -150,23 +212,23 @@ class Ball:
                                  25, 25)
 
     def get_bb(self):
-        if self.x > 500:
-            return (self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) - 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
-                    self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) + 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
-        elif self.x < 500:
-            return (self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) - 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
-                    self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10)) + 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
-        else:
-            return (self.x - 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) - 25,
-                    self.x + 25,
-                    self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10) + 25)
+        calculated_x_1 = self.x - math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10))
+        calculated_x_2 = self.x + math.cos(self.dir + math.pi / 2) * (self.z // (50 - abs(500 - self.x) // 10))
+        calculated_y = self.y + math.sin(self.dir + math.pi / 2) * (self.z // 10)
+
+        if self.state_machine.cur_state == Serve_Do:
+            return (self.x - 25, self.y + math.sin(self.dir + math.pi / 2) * (self.z // 5) - 25,
+                    self.x + 25, self.y + math.sin(self.dir + math.pi / 2) * (self.z // 5) + 25)
+
+        if self.x > 500: return (calculated_x_1- 25, calculated_y - 25, calculated_x_1 + 25, calculated_y + 25)
+        elif self.x < 500: return (calculated_x_2 - 25, calculated_y - 25, calculated_x_2 + 25, calculated_y + 25)
+        else: return (self.x - 25, calculated_y - 25, self.x + 25, calculated_y + 25)
 
     def handle_collision(self, group, other):
+        if self.state_machine.cur_state == Serve_Do:
+            if group == 'player:ball':
+                self.state_machine.handle_event(('GAME_START', None))
+
         if group == 'player:ball':
             self.bounced = False
 

@@ -12,6 +12,7 @@ from ball import Ball
 from referee import Referee
 from shadow import Shadow
 
+serve = 'player_2'
 
 def init():
     global court, net, pannel
@@ -47,9 +48,11 @@ def init():
     game_world.add_collision_pair('player:ball', None, ball)
 
 
-
 def finish():
+    global serve
+
     game_world.clear()
+    serve = 'player_2' if serve == 'player_1' else 'player_1'
 
 
 def update():
@@ -76,6 +79,7 @@ def handle_events():
         else:
             player_1.handle_event(event)
             player_2.handle_event(event)
+            ball.handle_event(event)
 
 
 def pause():
