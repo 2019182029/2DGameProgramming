@@ -1,10 +1,9 @@
 from pico2d import *
-
-import game_world
 from background import Background
 from pannel import Pannel
 from arrow import Arrow
 
+import game_world
 import game_framework
 import play_mode
 import title_mode

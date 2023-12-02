@@ -5,6 +5,10 @@ def cha_stop(e):
     return e[0] == 'CHA_STOPPED'
 
 
+def game_start(e):
+    return e[0] == 'GAME_START'
+
+
 def game_over(e):
     return e[0] == 'Score'
 

@@ -1,6 +1,7 @@
 from pico2d import *
 from event_check import *
 
+import play_mode
 import game_world
 import game_framework
 
@@ -20,7 +21,7 @@ FRAMES_PER_TIME = ACTION_PER_TIME * FRAMES_PER_ACTION
 COURT_WIDTH = 1000
 COURT_HEIGHT = 950
 
-actions = {'Idle': 0, 'Run': 1, 'Stand': 2, 'Swing': 3}
+actions = {'Idle': 0, 'Run': 1, 'Stand': 2, 'Swing': 3, 'Serve_Ready': 4, 'Serve_Do': 5, 'Serve_Swing': 6}
 
 
 class Idle:
@@ -113,15 +114,82 @@ class Run:
         elif player.face_dir == 'Left': player.composite_draw_player()
 
 
+class Serve_Ready:
+    @staticmethod
+    def enter(player, e):
+        player.action = actions['Serve_Ready']
+
+        if right_down(e) or left_up(e): player.xdir += 1
+        elif left_down(e) or right_up(e): player.xdir -= 1
+
+    @staticmethod
+    def exit(player, e):
+        if space_down(e): player.xdir = 0
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+        player.x += player.xdir * RUN_SPEED_PPS * game_framework.frame_time
+
+    @staticmethod
+    def draw(player):
+        player.draw_player(23 * 4, 40 * 4 + 17)
+
+
+class Serve_Do:
+    @staticmethod
+    def enter(player, e):
+        player.action = actions['Serve_Do']
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+
+    @staticmethod
+    def draw(player):
+        player.draw_player(23 * 4, 40 * 4 + 17)
+
+
+class Serve_Swing:
+    @staticmethod
+    def enter(player, e):
+        player.action = actions['Serve_Swing']
+        player.frame = 0
+
+    @staticmethod
+    def exit(player, e):
+        pass
+
+    @staticmethod
+    def do(player):
+        if player.frame + FRAMES_PER_TIME * game_framework.frame_time > FRAMES_PER_ACTION:
+            player.state_machine.handle_event(('GAME_START', None))
+        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.75) % 4
+        if 1 <= int(player.frame) <= 2:
+            player.collision_xy = (player.x, player.y + 50, player.x + 50, player.y + 100)
+
+    @staticmethod
+    def draw(player):
+        player.draw_player(23 * 4, 40 * 4 + 17)
+
+
 class StateMachine:
     def __init__(self, player):
         self.player = player
-        self.cur_state = Idle
+        self.cur_state = Serve_Ready if play_mode.serve == 'player_1' else Idle
         self.transitions = {
             Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run,
                    up_down: Run, down_down: Run, up_up: Run, down_up: Run, space_down: Idle},
             Run: {right_down: Run, left_down: Run, right_up: Run, left_up: Run,
-                  up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stop: Idle, space_down: Run}
+                  up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stop: Idle, space_down: Run},
+            Serve_Ready: {right_down: Serve_Ready, left_down: Serve_Ready, right_up: Serve_Ready, left_up: Serve_Ready,
+                           space_down: Serve_Do},
+            Serve_Do: {space_down: Serve_Swing},
+            Serve_Swing: {game_start: Idle}
         }
 
     def start(self):

@@ -74,8 +74,9 @@ class Score:
     @staticmethod
     def do(ball):
         if (get_time() - ball.score_start_time > 1):
-            game_framework.push_mode(score_mode)
+            # game_framework.push_mode(score_mode)
             # game_framework.quit()
+            pass
 
         ball.x += ball.xdir * RUN_SPEED_PPS * game_framework.frame_time
         ball.y += ball.ydir * RUN_SPEED_PPS * game_framework.frame_time
@@ -168,10 +169,17 @@ class Ball:
     def handle_collision(self, group, other):
         if group == 'player:ball':
             self.bounced = False
-            self.xdir = random.randint(-10, 10) / 200
+
+            if other == play_mode.player_1:
+                self.xdir = 0.05 if play_mode.player_1.swing_dir == 'Left' else -0.05
+            else:
+                self.xdir = -0.05 if play_mode.player_2.swing_dir == 'Left' else 0.05
+
             if self.ydir == 0: self.ydir = 0.5
             elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
                 self.ydir *= -1
+
             if self.zdir < 0: self.zdir *= -1
+
         elif group == 'ball:pannel':
             if self.ydir > 0: self.ydir *= -1
