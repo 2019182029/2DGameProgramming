@@ -228,6 +228,7 @@ class Player:
         self.swing_dir = 'Right'
 
         self.image = load_image(image)
+
         self.state_machine = StateMachine(self)
         self.state_machine.start()
 

@@ -14,7 +14,7 @@ def init():
     global title_mode_start_time
     global instruction_display
 
-    title_menu = Background('resource\\title_mode\\title_menu.png')
+    title_menu = Background('resource\\title_mode\\title_menu.png', music = 'resource\\title_mode\\title_mode.mp3')
     instruction = Pannel('resource\\title_mode\\title_instruction.png', 250 * 2, 225 * 2, 250 * 4, 225 * 4)
 
     game_world.add_object(title_menu)
@@ -50,4 +50,5 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
+            title_menu.bgm.pause()
             game_framework.change_mode(select_mode)

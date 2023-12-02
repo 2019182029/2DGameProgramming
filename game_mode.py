@@ -11,7 +11,8 @@ def init():
     global game_set
     global game_mode_start_time
 
-    game_set = Pannel('resource\\score_mode\\game_set.png', 500, 300, 900, 250)
+    game_set = Pannel('resource\\score_mode\\game_set.png', 500, 300, 900, 250,
+                      'resource\\score_mode\\game_set.mp3')
 
     game_world.add_object(game_set, 5)
 
@@ -23,7 +24,7 @@ def finish():
 
 
 def update():
-    if (get_time() - game_mode_start_time > 5):
+    if (get_time() - game_mode_start_time > 13):
         while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
         game_framework.change_mode(title_mode)
 
@@ -40,9 +41,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
-            if event.key == SDLK_ESCAPE:
-                game_framework.push_mode(pause_mode)
             if event.key == SDLK_SPACE:
+                game_set.bgm.pause()
                 while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
                 game_framework.change_mode(title_mode)
 
