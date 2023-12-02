@@ -117,7 +117,7 @@ class Serve_Ready:
     @staticmethod
     def do(ball):
         if play_mode.serve == 'player_1': ball.x, ball.y = play_mode.player_1.x + 35, play_mode.player_1.y + 20
-        else: ball.x, ball.y = play_mode.player_2.x - 15, play_mode.player_2.y - 15
+        else: ball.x, ball.y = play_mode.p2.x - 15, play_mode.p2.y - 15
 
     @staticmethod
     def draw(ball):
@@ -128,7 +128,7 @@ class Serve_Do:
     @staticmethod
     def enter(ball, e):
         if play_mode.serve == 'player_1': ball.x, ball.y = play_mode.player_1.x + 38, play_mode.player_1.y + 50
-        else: ball.x, ball.y = play_mode.player_2.x - 10, play_mode.player_2.y + 18
+        else: ball.x, ball.y = play_mode.p2.x - 10, play_mode.p2.y + 18
 
     @staticmethod
     def exit(ball, e):
@@ -171,7 +171,7 @@ class StateMachine:
         self.transitions = {
             Rally: {game_over: Score},
             Score: {},
-            Serve_Ready: {space_down: Serve_Do, mouse_click: Serve_Do},
+            Serve_Ready: {p1_space_down: Serve_Do, p2_mouse_click: Serve_Do},
             Serve_Do: {game_start: Rally, game_over: Score}
         }
 
@@ -288,7 +288,7 @@ class Ball:
                     self.last_hitted_by = 'player_1'
                     self.rally_sound.play()
                 else:
-                    self.xdir = -0.25 if play_mode.player_2.swing_dir == 'Left' else 0.25
+                    self.xdir = -0.25 if play_mode.p2.swing_dir == 'Left' else 0.25
                     self.last_hitted_by = 'player_2'
                     self.rally_sound.play()
 
@@ -298,12 +298,12 @@ class Ball:
                     self.last_hitted_by = 'player_1'
                     self.rally_sound.play()
                 else:
-                    self.xdir = -0.05 if play_mode.player_2.swing_dir == 'Left' else 0.05
+                    self.xdir = -0.05 if play_mode.p2.swing_dir == 'Left' else 0.05
                     self.last_hitted_by = 'player_2'
                     self.rally_sound.play()
 
             if self.ydir == 0: self.ydir = 0.5
-            elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.player_2):
+            elif (self.ydir < 0 and other == play_mode.player_1) or (self.ydir > 0 and other == play_mode.p2):
                 self.ydir *= -1
 
             if self.zdir < 0: self.zdir *= -1

@@ -1,5 +1,7 @@
 from pico2d import *
 
+import play_mode
+
 
 def cha_stop(e):
     return e[0] == 'CHA_STOPPED'
@@ -54,6 +56,11 @@ def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
 
+def p1_space_down(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+            and play_mode.serve == 'player_1')
+
+
 
 
 
@@ -93,3 +100,8 @@ def s_up(e):
 
 def mouse_click(e):
     return e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN and e[1].button == SDL_BUTTON_LEFT
+
+
+def p2_mouse_click(e):
+    return (e[0] == 'INPUT' and e[1].type == SDL_MOUSEBUTTONDOWN and e[1].button == SDL_BUTTON_LEFT
+            and play_mode.serve == 'player_2')

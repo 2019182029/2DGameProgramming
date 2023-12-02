@@ -52,7 +52,11 @@ def handle_events():
             arrow.y = mode_selection['PVP']
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP) and arrow.y == mode_selection['PVP']:
             arrow.y = mode_selection['PVE']
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE) and arrow.y == mode_selection['PVE']:
+            play_mode.game_mode = 'PVE'
+            game_framework.change_mode(play_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE) and arrow.y == mode_selection['PVP']:
+            play_mode.game_mode = 'PVP'
             game_framework.change_mode(play_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.change_mode(title_mode)

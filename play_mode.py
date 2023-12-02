@@ -14,10 +14,11 @@ from shadow import Shadow
 from bubble import Bubble
 
 serve = 'player_1'
+game_mode = None
 
 def init():
     global court, net, pannel
-    global player_1, player_2
+    global player_1, player_2, player_cpu, p2
     global ball, shadow
     global referee
     global bubble
@@ -30,9 +31,18 @@ def init():
     game_world.add_object(pannel)
 
     player_1 = P1(500, 150, 'resource\\objects\\tennis_player_1.png')
-    player_2 = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
     game_world.add_object(player_1, 4)
-    game_world.add_object(player_2, 1)
+
+    if game_mode == 'PVP':
+        player_2 = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
+        p2 = player_2
+        game_world.add_object(player_2, 1)
+        game_world.add_collision_pair('player:ball', player_2, None)
+    else:
+        player_cpu = P2(500, 800, 'resource\\objects\\tennis_player_2.png')
+        p2 = player_cpu
+        game_world.add_object(player_cpu, 1)
+        game_world.add_collision_pair('player:ball', player_cpu, None)
 
     ball = Ball()
     shadow = Shadow()
@@ -48,7 +58,6 @@ def init():
     game_world.add_collision_pair('ball:pannel', ball, None)
 
     game_world.add_collision_pair('player:ball', player_1, None)
-    game_world.add_collision_pair('player:ball', player_2, None)
     game_world.add_collision_pair('player:ball', None, ball)
 
 
@@ -81,7 +90,7 @@ def handle_events():
             game_framework.push_mode(pause_mode)
         else:
             player_1.handle_event(event)
-            player_2.handle_event(event)
+            if game_mode == 'PVP': p2.handle_event(event)
             ball.handle_event(event)
 
 
