@@ -6,6 +6,7 @@ import game_world
 import pause_mode
 import play_mode
 import title_mode
+import score_mode
 
 def init():
     global game_set
@@ -25,6 +26,7 @@ def finish():
 
 def update():
     if (get_time() - game_mode_start_time > 13):
+        score_mode.p1_score_num, score_mode.p2_score_num = 0, 0
         while game_framework.stack[-1] != play_mode: game_framework.pop_mode()
         game_framework.change_mode(title_mode)
 

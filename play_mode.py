@@ -45,9 +45,7 @@ def init():
     else:
         player_cpu = CPU(500, 800, 'resource\\objects\\tennis_player_2.png')
         p2 = player_cpu
-
     game_world.add_object(p2, 1)
-    game_world.add_collision_pair('player:ball', p2, None)
 
     referee = Referee('resource\\objects\\referee.png')
     bubble = Bubble('resource\\objects\\speech_bubble.png')
@@ -58,6 +56,7 @@ def init():
     game_world.add_collision_pair('ball:pannel', ball, None)
 
     game_world.add_collision_pair('player:ball', player_1, None)
+    game_world.add_collision_pair('player:ball', p2, None)
     game_world.add_collision_pair('player:ball', None, ball)
 
 

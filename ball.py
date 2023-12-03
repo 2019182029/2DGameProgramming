@@ -289,6 +289,7 @@ class Ball:
                 self.state_machine.handle_event(('GAME_START', None))
 
             self.bounced = False
+
             if play_mode.game_mode == 'PVP':
                 is_serve = other.state_machine.cur_state == SS1 or other.state_machine.cur_state == SS2
             else:
@@ -299,6 +300,7 @@ class Ball:
                     self.xdir = 0.25 if play_mode.player_1.swing_dir == 'Left' else -0.25
                     self.last_hitted_by = 'player_1'
                     self.rally_sound.play()
+                    self.tc = random.choice((700, 750, 800))
                 else:
                     self.xdir = -0.25 if play_mode.p2.swing_dir == 'Left' else 0.25
                     self.last_hitted_by = 'player_2'
@@ -309,6 +311,7 @@ class Ball:
                     self.xdir = 0.05 if play_mode.player_1.swing_dir == 'Left' else -0.05
                     self.last_hitted_by = 'player_1'
                     self.rally_sound.play()
+                    self.tc = random.choice((700, 750, 800))
                 else:
                     self.xdir = -0.05 if play_mode.p2.swing_dir == 'Left' else 0.05
                     self.last_hitted_by = 'player_2'
@@ -316,13 +319,11 @@ class Ball:
                     self.c = None
 
             if self.ydir == 0: self.ydir = 0.5
-            elif self.ydir < 0 and other == play_mode.player_1:
-                self.ydir = 0.5
-            elif self.ydir > 0 and other == play_mode.p2:
-                self.ydir = -0.5
+            elif self.ydir < 0 and other == play_mode.player_1: self.ydir = 0.6
+            elif self.ydir > 0 and other == play_mode.p2: self.ydir = -0.5
 
             if other == play_mode.player_1:
-                self.c = (800 - self.y) / (self.ydir * RUN_SPEED_PPS * game_framework.frame_time)
+                self.c = (self.tc - self.y) / (self.ydir * RUN_SPEED_PPS * game_framework.frame_time)
                 self.tx = self.x + self.xdir * RUN_SPEED_PPS * game_framework.frame_time * self.c
                 self.ty = self.y + self.ydir * RUN_SPEED_PPS * game_framework.frame_time * self.c
 

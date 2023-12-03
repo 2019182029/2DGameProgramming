@@ -44,7 +44,6 @@ def update():
     global p1_score_num, p2_score_num
 
     if (get_time() - score_mode_start_time > 2):
-        p1_score_num, p2_score_num = 0, 0
         game_framework.pop_mode()
         game_framework.change_mode(play_mode)
     # pass
