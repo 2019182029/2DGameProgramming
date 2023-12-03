@@ -7,6 +7,7 @@ import game_world
 import game_framework
 import play_mode
 import title_mode
+import score_mode
 
 mode_selection = {'PVE': 470, 'PVP': 358}
 
@@ -54,9 +55,11 @@ def handle_events():
             arrow.y = mode_selection['PVE']
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE) and arrow.y == mode_selection['PVE']:
             play_mode.game_mode = 'PVE'
+            score_mode.p1_score_num, score_mode.p2_score_num = 0, 0
             game_framework.change_mode(play_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE) and arrow.y == mode_selection['PVP']:
             play_mode.game_mode = 'PVP'
+            score_mode.p1_score_num, score_mode.p2_score_num = 0, 0
             game_framework.change_mode(play_mode)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.change_mode(title_mode)
