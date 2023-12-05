@@ -6,8 +6,8 @@ import game_world
 import game_framework
 
 # Player Run Speed
-PIXEL_PER_METER = (10.0 / 0.06)
-RUN_SPEED_KMPH = 10.0
+PIXEL_PER_METER = (10.0 / 0.1)
+RUN_SPEED_KMPH = 20.0
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
