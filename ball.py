@@ -331,5 +331,10 @@ class Ball:
         elif group == 'ball:pannel':
             if self.last_hitted_by == 'player_1':
                 self.wall_bounded = True
-                if self.ydir > 0: self.ydir *= -0.25
+                if self.ydir > 0:
+                    self.ydir *= -0.25
+                    if self.bounced == False:
+                        play_mode.bubble.frame = judgment['OUT']
+                        score_mode.p2_score_num += 1
+                        self.state_machine.handle_event(('Score', None))
                 if self.zdir > 0: self.zdir *= -1

@@ -11,6 +11,14 @@ def game_start(e):
     return e[0] == 'GAME_START'
 
 
+def game_start_idle(e):
+    return e[0] == 'GAME_START_IDLE'
+
+
+def game_start_run(e):
+    return e[0] == 'GAME_START_RUN'
+
+
 def game_over(e):
     return e[0] == 'Score'
 

@@ -124,11 +124,10 @@ class Serve_Ready:
 
     @staticmethod
     def exit(player, e):
-        if space_down(e): player.xdir = 0
+        pass
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
         player.x += player.xdir * RUN_SPEED_PPS * game_framework.frame_time
 
     @staticmethod
@@ -139,6 +138,10 @@ class Serve_Ready:
 class Serve_Do:
     @staticmethod
     def enter(player, e):
+        if right_down(e) or left_up(e): player.xdir += 1
+        elif left_down(e) or right_up(e): player.xdir -= 1
+        if up_down(e) or down_up(e): player.ydir += 1
+        elif down_down(e) or up_up(e): player.ydir -= 1
         player.action = actions['Serve_Do']
         player.swing_dir = 'Right' if player.x >= 500 else 'Left'
 
@@ -148,7 +151,7 @@ class Serve_Do:
 
     @staticmethod
     def do(player):
-        player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time) % 4
+        pass
 
     @staticmethod
     def draw(player):
@@ -158,8 +161,11 @@ class Serve_Do:
 class Serve_Swing:
     @staticmethod
     def enter(player, e):
+        if right_down(e) or left_up(e): player.xdir += 1
+        elif left_down(e) or right_up(e): player.xdir -= 1
+        if up_down(e) or down_up(e): player.ydir += 1
+        elif down_down(e) or up_up(e): player.ydir -= 1
         player.action = actions['Serve_Swing']
-        player.frame = 0
 
     @staticmethod
     def exit(player, e):
@@ -168,7 +174,8 @@ class Serve_Swing:
     @staticmethod
     def do(player):
         if player.frame + FRAMES_PER_TIME * game_framework.frame_time > FRAMES_PER_ACTION:
-            player.state_machine.handle_event(('GAME_START', None))
+            if player.xdir == 0: player.state_machine.handle_event(('GAME_START_IDLE', None))
+            else: player.state_machine.handle_event(('GAME_START_RUN', None))
         player.frame = (player.frame + FRAMES_PER_TIME * game_framework.frame_time * 0.75) % 4
         if 1 <= int(player.frame) <= 2:
             player.collision_xy = (player.x, player.y + 50, player.x + 50, player.y + 100)
@@ -189,8 +196,12 @@ class StateMachine:
                   up_down: Run, down_down: Run, up_up: Run, down_up: Run, cha_stop: Idle, space_down: Run},
             Serve_Ready: {right_down: Serve_Ready, left_down: Serve_Ready, right_up: Serve_Ready, left_up: Serve_Ready,
                           space_down: Serve_Do},
-            Serve_Do: {space_down: Serve_Swing},
-            Serve_Swing: {game_start: Idle}
+            Serve_Do: {right_down: Serve_Do, left_down: Serve_Do, right_up: Serve_Do, left_up: Serve_Do,
+                       up_down: Serve_Do, down_down: Serve_Do, up_up: Serve_Do, down_up: Serve_Do,
+                       space_down: Serve_Swing},
+            Serve_Swing: {right_down: Serve_Swing, left_down: Serve_Swing, right_up: Serve_Swing, left_up: Serve_Swing,
+                          up_down: Serve_Swing, down_down: Serve_Swing, up_up: Serve_Swing, down_up: Serve_Swing,
+                          game_start_idle: Idle, game_start_run: Run}
         }
 
     def start(self):
